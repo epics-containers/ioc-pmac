@@ -1,0 +1,45 @@
+// For format details, see https://aka.ms/devcontainer.json
+{
+    "name": "ioc-pmac-dev",
+
+    "image": "ghcr.io/epics-containers/ioc-pmac:work",
+    // This would enable copying the repos out of the container current recommendation is to use 
+    // cdev-prep from https://github.com/epics-containers/k8s-epics-utils/blob/main/dev-functions.sh
+    // "initializeCommand": "mkdir -p ${localWorkspaceFolder}/repos && podman run --rm --privileged -dv ${localWorkspaceFolder}/repos:/copy ghcr.io/epics-containers/ioc-pmac:work rsync -a /repos/ /copy",
+    // these two lines mount the local repo folder over /repo in the container.
+    "workspaceMount": "source=${localWorkspaceFolder}/repos,target=/repos,type=bind,consistency=cached", 
+    "workspaceFolder": "${localWorkspaceFolder}",
+    "remoteEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "HOME": "${localEnv:HOME}",
+        "HOSTNAME": "ioc-pmac-dev",
+        "USER": "${localEnv:USER}",
+    },
+    // Set *default* container specific settings.json values on container create.
+    "settings": {},
+    // Add the IDs of extensions you want installed when the container is created.
+    "extensions": [
+		"ms-vscode.cpptools",
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"ms-vscode.cmake-tools",
+		"streetsidesoftware.code-spell-checker",
+		"ryanluker.vscode-coverage-gutters",
+		"mhutchie.git-graph",
+		"eamodio.gitlens",
+		"gruntfuggly.todo-tree",
+		"redhat.vscode-yaml",
+		"nsd.vscode-epics",
+		"alefragnani.bookmarks"
+	],
+    "mounts": [
+        "source=/scratch,target=/scratch,type=bind,consistency=cached",
+        "source=${localEnv:HOME},target=${localEnv:HOME},type=bind,consistency=cached",
+    ],
+    "runArgs": [
+        "-h=ioc-pmac-dev",
+        "--privileged",
+        "--net=host",
+        "-ti",
+    ],
+}
