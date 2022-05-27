@@ -33,10 +33,9 @@
 		"alefragnani.bookmarks"
 	],
     "mounts": [
-        "source=/scratch,target=/scratch,type=bind,consistency=cached",
         "source=${localEnv:HOME},target=${localEnv:HOME},type=bind,consistency=cached",
     ],
-    "runArgs": [
+    "runArgs": [ 
         "-h=ioc-pmac-dev",
         "--privileged",
         "--net=host",
