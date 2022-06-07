@@ -1,6 +1,6 @@
 # Add support for delta tau turbo pmac 2 and power pmac
 ARG MOTOR_VERSION=R7-2-3b1
-ARG PMAC_VERSION=2-5-3
+ARG PMAC_VERSION=2-6-0b2
 ARG IPAC_VERSION=2.16
 
 ##### build stage ##############################################################
@@ -26,7 +26,6 @@ RUN python3 module.py add epics-modules ipac IPAC ${IPAC_VERSION} && \
 
 # add CONFIG_SITE.linux
 COPY CONFIG_SITE.linux-x86_64.Common ${SUPPORT}/pmac-${PMAC_VERSION}/configure
-RUN cp ${SUPPORT}/motor-${MOTOR_VERSION}/motorApp/Db/basic_asyn_motor.db ${SUPPORT}/motor-${MOTOR_VERSION}/motorApp/Db/basic_asyn_motor.template
 
 # update the generic IOC Makefile to include the new support
 COPY Makefile ${IOC}/iocApp/src
@@ -49,4 +48,5 @@ ARG IPAC_VERSION
 # get the products from the build stage
 COPY --from=developer ${SUPPORT}/motor-${MOTOR_VERSION} ${SUPPORT}/motor-${MOTOR_VERSION}
 COPY --from=developer ${SUPPORT}/pmac-${PMAC_VERSION} ${SUPPORT}/pmac-${PMAC_VERSION}
+COPY --from=developer ${SUPPORT}/configure/RELEASE* ${SUPPORT}/configure/
 COPY --from=developer ${IOC} ${IOC}
