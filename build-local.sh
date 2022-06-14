@@ -13,15 +13,19 @@ export VERSION=${VERSION:-$(read -p "VERSION (must be used in all FROM): " IN; e
 
 # use 1st cli argument to override the target containers e.g.
 #   build-local.sh ioc-pmac
-targets=${1:-"epics-base,epics-modules,ioc-pmac"}
+if (($# > 0)); then
+    targets=("$@");
+else
+    targets=(epics-base epics-modules ioc-pmac);
+fi
 
 set -e -x
 
-for repo in {${targets}}; do
+for repo in "${targets[@]}"; do
     podman build --target developer \
-        -t ghcr.io/epics-containers/${repo}:${VERSION} \
-        ../${repo}
+        -t ghcr.io/epics-containers/"${repo}":${VERSION} \
+        ../"${repo}"
     podman build \
-        -t ghcr.io/epics-containers/${repo}:${VERSION}.run \
-        ../${repo}
+        -t ghcr.io/epics-containers/"${repo}":${VERSION}.run \
+        ../"${repo}"
 done

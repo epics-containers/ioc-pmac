@@ -7,7 +7,7 @@ ARG IPAC_VERSION=2.16
 
 # NOTE: update all FROM when changing epics-base version
 # This is not DRY but allows github dependabot to manage the versions
-FROM ghcr.io/epics-containers/epics-modules:1.1.1 AS developer
+FROM ghcr.io/epics-containers/epics-modules:1.1.2 AS developer
 
 ARG MOTOR_VERSION
 ARG PMAC_VERSION
@@ -46,7 +46,7 @@ COPY ibek ${IOC}/ibek/
 
 ##### runtime stage #############################################################
 
-FROM ghcr.io/epics-containers/epics-modules:1.1.1.run AS runtime
+FROM ghcr.io/epics-containers/epics-modules:1.1.2.run AS runtime
 
 ARG MOTOR_VERSION
 ARG PMAC_VERSION
@@ -57,5 +57,3 @@ COPY --from=developer ${SUPPORT}/motor-${MOTOR_VERSION} ${SUPPORT}/motor-${MOTOR
 COPY --from=developer ${SUPPORT}/pmac-${PMAC_VERSION} ${SUPPORT}/pmac-${PMAC_VERSION}
 COPY --from=developer ${SUPPORT}/configure/RELEASE* ${SUPPORT}/configure/
 COPY --from=developer ${IOC} ${IOC}
-# ibek / any other python updates
-COPY --from=developer /root/.local /root/.local
