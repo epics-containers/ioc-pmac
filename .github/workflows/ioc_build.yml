@@ -1,8 +1,14 @@
 name: Build and publish image to ghcr.io/epics-containers
-
 on:
   push:
-  pull_request:
+    branches:
+      # Restricting to these branches and tags stops duplicate jobs on internal
+      # PRs but stops CI running on internal branches without a PR. Delete the
+      # next 5 lines to restore the original behaviour
+      - master
+      - main
+    tags:
+      - "*"
 
 jobs:
   build-and-push-image:
@@ -60,3 +66,25 @@ jobs:
           target: runtime
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+
+  publish-ioc-schema:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: make-schema
+        run: |
+          pip install ibek
+          ibek ioc-schema ibek/* ioc.ibek.schema.yaml
+
+      - name: Github Release
+        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 # v0.1.14
+        with:
+          files: ioc.ibek.schema.yaml
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
