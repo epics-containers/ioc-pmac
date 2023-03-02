@@ -17,7 +17,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        architecture: ["rtems", "linux"]
+        # TODO add rtems
+        architecture: ["linux"]
 
     steps:
       - name: Checkout

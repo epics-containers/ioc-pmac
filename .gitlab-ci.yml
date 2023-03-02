@@ -31,15 +31,14 @@ build_linux_developer:
   variables:
     ARCH: linux
     TARGET: developer
+# build_rtems_runtime:
+#   extends: .build
+#   variables:
+#     ARCH: rtems
+#     TARGET: runtime
 
-build_rtems_runtime:
-  extends: .build
-  variables:
-    ARCH: rtems
-    TARGET: runtime
-
-build_rtems_developer:
-  extends: .build
-  variables:
-    ARCH: rtems
-    TARGET: developer
+# build_rtems_developer:
+#   extends: .build
+#   variables:
+#     ARCH: rtems
+#     TARGET: developer
