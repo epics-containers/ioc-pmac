@@ -27,7 +27,8 @@ COPY ibek-defs/autosave/ /ctools/autosave/
 RUN python3 modules.py install AUTOSAVE R5-10-2 github.com/epics-modules/autosave.git --patch autosave/autosave.sh
 RUN make -C ${SUPPORT}/autosave -j $(nproc)
 
-RUN python3 modules.py install BUSY R1-7-3 github.com/epics-modules/busy.git
+# must use global patch to support RTEMS
+RUN python3 modules.py install BUSY R1-7-3 github.com/epics-modules/busy.git --patch _global/global.sh
 RUN make -C ${SUPPORT}/busy -j $(nproc)
 
 RUN python3 modules.py install SSCAN R2-11-5 github.com/epics-modules/sscan.git
@@ -54,7 +55,7 @@ FROM developer AS runtime_prep
 
 # get the products from the build stage and reduce to runtime assets only
 WORKDIR /min_files
-RUN bash /ctools/minimize.sh ${IOC} $(ls -d ${SUPPORT}/*/)
+RUN bash /ctools/minimize.sh ${IOC} $(ls -d ${SUPPORT}/*/) /ctools
 
 ##### runtime stage ############################################################
 
