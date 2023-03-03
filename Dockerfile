@@ -1,7 +1,7 @@
 ##### build stage ##############################################################
 
 ARG TARGET_ARCHITECTURE
-ARG BASE=23.2.1
+ARG BASE=23.3.1
 
 FROM  ghcr.io/epics-containers/epics-base-${TARGET_ARCHITECTURE}-developer:${BASE} AS developer
 
