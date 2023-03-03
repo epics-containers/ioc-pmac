@@ -27,9 +27,11 @@ COPY ibek-defs/autosave/ /ctools/autosave/
 RUN python3 modules.py install AUTOSAVE R5-10-2 github.com/epics-modules/autosave.git --patch autosave/autosave.sh
 RUN make -C ${SUPPORT}/autosave -j $(nproc)
 
+COPY ibek-defs/busy/ /ctools/busy/
 RUN python3 modules.py install BUSY R1-7-3 github.com/epics-modules/busy.git
 RUN make -C ${SUPPORT}/busy -j $(nproc)
 
+COPY ibek-defs/sscan/ /ctools/sscan/
 RUN python3 modules.py install SSCAN R2-11-5 github.com/epics-modules/sscan.git
 RUN make -C ${SUPPORT}/sscan -j $(nproc)
 
@@ -37,6 +39,7 @@ COPY ibek-defs/calc/ /ctools/calc/
 RUN python3 modules.py install CALC R3-7-4 github.com/epics-modules/calc.git --patch calc/calc.sh
 RUN make -C ${SUPPORT}/calc -j $(nproc)
 
+COPY ibek-defs/motor/ /ctools/motor/
 RUN python3 modules.py install MOTOR R7-2-3b1 github.com/dls-controls/motor.git
 RUN make -C ${SUPPORT}/motor -j $(nproc)
 
