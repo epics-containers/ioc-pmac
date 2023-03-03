@@ -33,7 +33,8 @@ RUN make -C ${SUPPORT}/busy -j $(nproc)
 RUN python3 modules.py install SSCAN R2-11-5 github.com/epics-modules/sscan.git
 RUN make -C ${SUPPORT}/sscan -j $(nproc)
 
-RUN python3 modules.py install CALC R3-7-4 github.com/epics-modules/calc.git
+COPY ibek-defs/calc/ /ctools/calc/
+RUN python3 modules.py install CALC R3-7-4 github.com/epics-modules/calc.git --patch calc/calc.sh
 RUN make -C ${SUPPORT}/calc -j $(nproc)
 
 RUN python3 modules.py install MOTOR R7-2-3b1 github.com/dls-controls/motor.git
