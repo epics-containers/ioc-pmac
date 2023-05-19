@@ -50,3 +50,16 @@ jobs:
           PUSH: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
           CACHE: ${{ env.CACHE }}
         run: .github/workflows/build.sh
+
+  tests:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: System Test
+        run: tests/run-tests.sh

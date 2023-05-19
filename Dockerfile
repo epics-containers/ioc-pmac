@@ -12,8 +12,10 @@ RUN apt-get update && apt-get upgrade -y && \
     libboost-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# override of epics-base ctools may occasionally be practical
+# override of epics-base ctools and ibek may be practical but should be removed
+# when epics-base is updated
 COPY ctools /ctools/
+RUN pip install ibek==0.9.5.b2 telnetlib3
 # copy the global ibek files
 COPY ibek-defs/_global /ctools/_global/
 
@@ -64,11 +66,20 @@ RUN bash /ctools/minimize.sh ${IOC} $(ls -d ${SUPPORT}/*/) /ctools
 
 FROM ghcr.io/epics-containers/epics-base-${TARGET_ARCHITECTURE}-runtime:${BASE} AS runtime
 
-# install runtime system dependencies
+# these installs required for RTEMS only
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
+    telnet netcat psmisc \
     libssh2-1 \
     && rm -rf /var/lib/apt/lists/*
 
 # add products from build stage
 COPY --from=runtime_prep /min_files /
+COPY --from=developer /venv /venv
+
+# add ioc scripts
+COPY ioc ${IOC}
+
+ENV TARGET_ARCHITECTURE ${TARGET_ARCHITECTURE}
+
+ENTRYPOINT ["/bin/bash", "-c", "${IOC}/start.sh"]

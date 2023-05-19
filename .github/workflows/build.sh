@@ -50,6 +50,8 @@ do_build() {
     shift 2
 
     image_name=${REGISTRY}/${REPOSITORY}-${ARCHITECTURE}-${TARGET}:${TAG}
+    # convert to lowercase - required for OCI URLs
+    image_name=${image_name,,}
     args="
         --build-arg TARGET_ARCHITECTURE=${ARCHITECTURE}
         --target ${TARGET}
