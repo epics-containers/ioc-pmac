@@ -11,7 +11,7 @@ RUN pip install --upgrade ibek==1.4.0
 
 # The devcontainer mounts the project root to /epics/ioc-adsimdetector. Using
 # the same location here makes devcontainer/runtime differences transparent.
-WORKDIR /epics/ioc-adsimdetector/ibek-support
+WORKDIR /epics/ioc-pmac/ibek-support
 
 # copy the global ibek files
 COPY ibek-support/_global/ _global
@@ -28,11 +28,17 @@ RUN autosave/install.sh R5-10-2
 COPY ibek-support/busy/ busy/
 RUN busy/install.sh R1-7-3
 
-COPY ibek-support/ADCore/ ADCore/
-RUN ADCore/install.sh R3-12-1
+COPY ibek-support/sscan/ sscan/
+RUN sscan/install.sh R2-11-6
 
-COPY ibek-support/ADSimDetector/ ADSimDetector/
-RUN ADSimDetector/install.sh R2-10
+COPY ibek-support/calc/ calc/
+RUN calc/install.sh R3-7-5
+
+COPY ibek-support/motor/ motor/
+RUN motor/install.sh R7-2-3b1
+
+COPY ibek-support/pmac/ pmac/
+RUN pmac/install.sh 2-4-10
 
 # Generate template IOC source tree / generate Makefile / compile
 RUN ibek ioc build
