@@ -9,8 +9,9 @@ FROM  ${REGISTRY}/epics-base-${TARGET_ARCHITECTURE}-developer:${BASE} AS develop
 # get latest ibek while under dev. In future the epics-base version will be used
 RUN pip install --upgrade ibek==1.4.2
 
-# the devcontainer mounts the project root to /epics/ioc-template
-WORKDIR /epics/ioc-template/ibek-support
+# The devcontainer mounts the project root to /epics/ioc-adsimdetector. Using
+# the same location here makes devcontainer/runtime differences transparent.
+WORKDIR /epics/ioc-pmac/ibek-support
 
 # copy the global ibek files
 COPY ibek-support/_global/ _global

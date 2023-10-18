@@ -15,6 +15,7 @@
         "EC_PROJECT": "${localWorkspaceFolderBasename}"
     },
     "features": {
+        // adds standard common-utils features - see
         "ghcr.io/devcontainers/features/common-utils:2": {
             "installZsh": false,
             "installOhMyZsh": false,
@@ -36,6 +37,10 @@
                 "epicsdeb.vscode-epics",
                 "ms-python.black-formatter"
             ]
+        },
+        "settings": {
+            // global python venv created in epics-base
+            "python.defaultInterpreterPath": "/venv/bin/python"
         }
     },
     // Make sure the files we are mapping into the container exist on the host
