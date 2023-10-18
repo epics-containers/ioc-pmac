@@ -1,13 +1,24 @@
 #!/bin/bash
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+################################################################################
+# generic local build script for epics-containers ioc repositories                   #
+################################################################################
 
-# a script to locally build all targets containers for this IOC
-# Note this requires the ec command form
-# https://github.com/epics-containers/epics-containers-cli
+# pass rtems as first argument to build RTEMS on cross-compiler
+TARGET_ARCHITECTURE=${1:-linux}
 
-cd ${THIS_DIR}
+set -xe
 
-ec dev build --arch linux
-# Todo get rtems working for pmac
-# ec dev build --arch rtems
+cd $(dirname ${0})
+
+# make sure new repos get their submodule ibek-support
+git submodule update --init
+
+# build runtime and developer images
+ec dev build --arch ${TARGET_ARCHITECTURE}
+
+# get the schema file from the developer container and save it locally
+ec dev launch-local --execute \
+'ibek ioc generate-schema /epics/links/ibek/*.ibek.support.yaml' \
+> ibek.ioc.schema.json
+

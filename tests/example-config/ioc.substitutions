@@ -1,7 +1,7 @@
 
 # Macros:
 #  IOC  Device prefix
-file $(DEVIOCSTATS)/db/iocAdminSoft.db
+file $(IOCSTATS)/db/iocAdminSoft.db
 {
 pattern { IOC }
     { "test-ioc" }
@@ -9,7 +9,7 @@ pattern { IOC }
 
 # Macros:
 #  IOC  Device prefix
-file $(DEVIOCSTATS)/db/iocAdminScanMon.db
+file $(IOCSTATS)/db/iocAdminScanMon.db
 {
 pattern { IOC }
     { "test-ioc" }
