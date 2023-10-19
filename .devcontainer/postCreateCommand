@@ -7,7 +7,7 @@
 
 if [[ $USER != "root" ]] ; then
     # make sure the non-root user can build iocs and (mounted in) support modules
-    sudo chown -R ${USER}:${USER} /epics/links
+    sudo chown -R ${USER}:${USER} /epics/links /venv
     sudo chown -h ${USER}:${USER} /epics /epics/ioc
 
     # also give non-root user access to the same bash config we use in podman
