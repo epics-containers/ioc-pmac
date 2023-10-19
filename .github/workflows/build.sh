@@ -42,5 +42,6 @@ ec dev launch-local ${EC_TAG} --execute \
 
 # run acceptance tests
 shopt -s nullglob # expand to nothing if no tests are found
+ls -l ${THIS}/../../tests
 for t in "${THIS}/../../tests/*.sh"; do ${t}; done
 
