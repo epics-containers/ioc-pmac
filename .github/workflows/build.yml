@@ -8,7 +8,6 @@ jobs:
   build-push-images:
     # pull requests are a duplicate of a branch push if within the same repo.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
-    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -17,9 +16,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO add rtems
-        architecture: ["linux"]
+        include:
+          - architecture: linux
+            os: ubuntu-latest
+            platform: linux/amd64
 
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -41,25 +43,41 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
       - name: Docker Build Script
         env:
-          REGISTRY: ghcr.io
           ARCH: ${{ matrix.architecture }}
-          REPOSITORY: ${{ github.repository }}
+          PLATFORM: ${{ matrix.platform }}
           TAG: ${{ github.ref_name }}
           PUSH: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
           CACHE: ${{ env.CACHE }}
         run: .github/workflows/build.sh
 
-  tests:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+      - name: Upload schema as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ioc-schema
+          path: ibek.ioc.schema.json
+
+  release:
+    # Release on tag push - publish ioc schema
+    needs: [build-push-images]
+    if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
-          submodules: recursive
+          name: ioc-schema
+          path: ./
 
-      - name: System Test
-        run: tests/run-tests.sh
+      - name: Github Release
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
+        with:
+          files: |
+            ibek.ioc.schema.json
+          generate_release_notes: true
