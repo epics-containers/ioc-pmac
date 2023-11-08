@@ -16,9 +16,11 @@ stages:
     - env | grep "CI_"
     - /bin/sh .gitlab/kanikobuild.sh
     - echo "Done!"
-  only:
-    refs:
-      - tags
+  # uncomment to only publish on tags. At present untagged builds are published
+  # to gcr.io/diamond-privreg/controls/work/ioc
+  # only:
+  #   refs:
+  #     - tags
 
 build_linux_runtime:
   extends: .build
