@@ -1,14 +1,10 @@
 ##### build stage ##############################################################
 
 ARG TARGET_ARCHITECTURE
-ARG BASE=7.0.7ec2
+ARG BASE=7.0.7ec3
 ARG REGISTRY=ghcr.io/epics-containers
 
 FROM  ${REGISTRY}/epics-base-${TARGET_ARCHITECTURE}-developer:${BASE} AS developer
-
-# Get latest ibek while in development. Will come from epics-base when stable
-COPY requirements.txt requirements.txt
-RUN pip install --upgrade -r requirements.txt
 
 # The devcontainer mounts the project root to /epics/ioc-adsimdetector. Using
 # the same location here makes devcontainer/runtime differences transparent.
@@ -40,9 +36,6 @@ RUN motor/install.sh R7-2-3b1
 
 COPY ibek-support/pmac/ pmac/
 RUN pmac/install.sh 2-4-10
-
-COPY ibek-support/ADAravis/ ADAravis/
-RUN ADAravis/install.sh R2-3
 
 # create IOC source tree, generate Makefile and compile IOC Instance
 RUN ibek ioc build
