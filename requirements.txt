@@ -1,2 +1,2 @@
-epics-containers-cli==2.6.3
+epics-containers-cli==2.6.7
 #git+https://github.com/epics-containers/epics-containers-cli.git@dev
