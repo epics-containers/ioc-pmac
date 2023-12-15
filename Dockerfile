@@ -1,16 +1,18 @@
 ##### build stage ##############################################################
 
 ARG TARGET_ARCHITECTURE
-ARG BASE=7.0.7ec2
+ARG BASE=7.0.7ec3
 ARG REGISTRY=ghcr.io/epics-containers
 
 FROM  ${REGISTRY}/epics-base-${TARGET_ARCHITECTURE}-developer:${BASE} AS developer
 
-# get latest ibek while under dev. In future the epics-base version will be used
-RUN pip install --upgrade ibek==1.4.2
+# Get latest ibek while in development. Will come from epics-base when stable
+COPY requirements.txt requirements.txt
+RUN pip install --upgrade -r requirements.txt
 
-# the devcontainer mounts the project root to /epics/ioc-template
-WORKDIR /epics/ioc-template/ibek-support
+# The devcontainer mounts the project root to /epics/ioc-adsimdetector. Using
+# the same location here makes devcontainer/runtime differences transparent.
+WORKDIR /epics/ioc-pmac/ibek-support
 
 # copy the global ibek files
 COPY ibek-support/_global/ _global
@@ -22,7 +24,7 @@ COPY ibek-support/asyn/ asyn/
 RUN asyn/install.sh R4-42
 
 COPY ibek-support/autosave/ autosave/
-RUN autosave/install.sh R5-10-2
+RUN autosave/install.sh R5-11
 
 COPY ibek-support/busy/ busy/
 RUN busy/install.sh R1-7-3
@@ -39,7 +41,13 @@ RUN motor/install.sh R7-2-3b1
 COPY ibek-support/pmac/ pmac/
 RUN pmac/install.sh 2-4-10
 
-# Generate template IOC source tree / generate Makefile / compile
+COPY ibek-support/motor/ motor/
+RUN motor/install.sh R7-3-1
+
+COPY ibek-support/pmac/ pmac/
+RUN pmac/install.sh 2-6-2b1
+
+# create IOC source tree, generate Makefile and compile IOC Instance
 RUN ibek ioc build
 
 ##### runtime preparation stage ################################################
