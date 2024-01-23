@@ -8,10 +8,8 @@ repos*
 # while working on ibek with this project somethimes include it as subfolder
 ibek
 
-# The ioc source tree is created here from a template inside the generic ioc
-# repo.
-# Remove from .gitignore if you want to customize the template.
-/ioc/
-
 # dont save workspaces as other users will have differing folders
 *workspace
+
+# config folder is there to be replaced there is just a dummy with Readme.
+ioc/config
