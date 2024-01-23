@@ -40,12 +40,6 @@ COPY ibek-support/calc/ calc/
 RUN calc/install.sh R3-7-5
 
 COPY ibek-support/motor/ motor/
-RUN motor/install.sh R7-2-3b1
-
-COPY ibek-support/pmac/ pmac/
-RUN pmac/install.sh 2-4-10
-
-COPY ibek-support/motor/ motor/
 RUN motor/install.sh R7-3-1
 
 COPY ibek-support/pmac/ pmac/
