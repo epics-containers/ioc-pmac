@@ -6,13 +6,17 @@ ARG REGISTRY=ghcr.io/epics-containers
 
 FROM  ${REGISTRY}/epics-base-${TARGET_ARCHITECTURE}-developer:${BASE} AS developer
 
+# The devcontainer mounts the project root to /epics/generic-source
+# Using the same location here makes devcontainer/runtime differences transparent.
+ENV SOURCE_FOLDER=/epics/generic-source
+# connect ioc source folder its know location
+RUN ln -s ${SOURCE_FOLDER}/ioc ${IOC}
+
 # Get latest ibek while in development. Will come from epics-base when stable
 COPY requirements.txt requirements.txt
 RUN pip install --upgrade -r requirements.txt
 
-# The devcontainer mounts the project root to /epics/ioc-adsimdetector. Using
-# the same location here makes devcontainer/runtime differences transparent.
-WORKDIR /epics/ioc-pmac/ibek-support
+WORKDIR ${SOURCE_FOLDER}/ibek-support
 
 # copy the global ibek files
 COPY ibek-support/_global/ _global
@@ -55,7 +59,7 @@ RUN ibek ioc build
 FROM developer AS runtime_prep
 
 # get the products from the build stage and reduce to runtime assets only
-RUN ibek ioc extract-runtime-assets /assets
+RUN ibek ioc extract-runtime-assets /assets ${SOURCE_FOLDER}/ibek*
 
 ##### runtime stage ############################################################
 
