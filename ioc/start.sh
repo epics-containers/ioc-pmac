@@ -63,19 +63,17 @@ description='
 function ibek_error {
     echo "${1}"
 
-    # Wait indefinitely so the container does not exit and restart continually.
-    while true; do
-        sleep 1000
-    done
+    # Wait for a bit so the container does not exit and restart continually
+    sleep 10
 }
 
 # environment setup ************************************************************
 
-set -x -e
+# log commands and stop on errors
+set -xe
 
-export TOP=$(realpath $(dirname $0))
-cd ${TOP}
-CONFIG_DIR=${TOP}/config
+cd ${IOC}
+CONFIG_DIR=${IOC}/config
 
 # add module paths to environment for use in ioc startup script
 if [[ -f ${SUPPORT}/configure/RELEASE.shell ]]; then
@@ -98,6 +96,14 @@ epics_db=${RUNTIME_DIR}/ioc.db
 
 # in case there are multiple YAML, pick the first one in the glob
 ibek_src=${ibek_yamls[0]}
+
+if [ -d ${CONFIG_DIR} ]; then
+    echo "checking config folder ${CONFIG_DIR}"
+    ls -al ${CONFIG_DIR}
+else
+    echo "ERROR: No config folder found."
+    ibek_error "${description}"
+fi
 
 # 1. start.sh override script **************************************************
 if [ -f ${override} ]; then
@@ -132,11 +138,9 @@ elif [ -f ${ioc_startup} ] ; then
         msi ${includes} -I${RUNTIME_DIR} -S ${CONFIG_DIR}/ioc.subst -o ${epics_db}
     fi
     final_ioc_startup=${ioc_startup}
-# 4. empty config folder ***************************************************
+# 4. incorrect config folder ***************************************************
 else
-    echo "No startup assets found in ${CONFIG_DIR}"
-    echo
-
+    echo "ERROR: No startup assets found in ${CONFIG_DIR}"
     ibek_error "${description}"
 fi
 

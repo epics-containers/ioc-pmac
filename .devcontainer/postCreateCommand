@@ -7,8 +7,8 @@
 
 if [[ $USER != "root" ]] ; then
     # make sure the non-root user can build iocs and (mounted in) support modules
-    sudo chown -R ${USER}:${USER} /epics/links /venv
-    sudo chown -h ${USER}:${USER} /epics /epics/ioc
+    sudo chown -R ${USER}:${USER} /epics/ibek-defs /epics/pvi-defs /epics/support/configure /venv
+    sudo chown -h ${USER}:${USER} /epics /epics/ioc /epics/support
 
     # also give non-root user access to the same bash config we use in podman
     sudo chmod a+rx /root
@@ -22,7 +22,6 @@ fi
 # Custom install script for each developer to add whatever they like to
 # all epics-containers devcontainers
 ################################################################################
-
 
 # add user's custom profile container creation script
 if [ -f ~/.bashprofile_dev_container ]; then
