@@ -4,18 +4,24 @@
 # generic local build script for epics-containers ioc repositories             #
 ################################################################################
 
-# pass rtems as first argument to build RTEMS on cross-compiler
-TARGET_ARCHITECTURE=${1:-linux}
+# set TARGET_ARCHITECTURE to rtems for RTEMS based targets
+T_A=${TARGET_ARCHITECTURE:-linux}
+# set TARGET to runtime for runtime images
+TARGET=${TARGET:-developer}
+# set TAG to override the default tag
+TAG=${TAG:-ec_test}
 
+# log commands and stop on erros
 set -xe
 
 cd $(dirname ${0})
 
+# use docker if available else use podman
+if ! docker version &>/dev/null; then alias docker=podman; fi
+
 # make sure new repos get their submodule ibek-support
 git submodule update --init
 
-# build runtime and developer images
-ec dev build --arch ${TARGET_ARCHITECTURE}
+# build and developer images
+docker build -t ${TAG} --build-arg TARGET_ARCHITECTURE=$T_A --target $TARGET .
 
-# get the schema file from the developer container and save it locally
-ec dev launch-local --execute 'ibek ioc generate-schema' > ibek.ioc.schema.json

@@ -13,3 +13,6 @@ ibek
 
 # config folder is there to be replaced there is just a dummy with Readme.
 ioc/config
+
+# podman may leave this around in aborted builds
+.build.swp
