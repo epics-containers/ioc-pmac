@@ -1,7 +1,7 @@
 ##### build stage ##############################################################
 
 ARG TARGET_ARCHITECTURE
-ARG BASE=7.0.7ec3
+ARG BASE=7.0.8ec1b1
 ARG REGISTRY=ghcr.io/epics-containers
 
 FROM  ${REGISTRY}/epics-base-${TARGET_ARCHITECTURE}-developer:${BASE} AS developer
@@ -21,8 +21,8 @@ WORKDIR ${SOURCE_FOLDER}/ibek-support
 # copy the global ibek files
 COPY ibek-support/_global/ _global
 
-COPY ibek-support/iocStats/ iocStats
-RUN iocStats/install.sh 3.1.16
+# COPY ibek-support/iocStats/ iocStats
+# RUN iocStats/install.sh 3.1.16
 
 COPY ibek-support/asyn/ asyn/
 RUN asyn/install.sh R4-42

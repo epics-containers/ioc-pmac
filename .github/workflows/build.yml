@@ -16,7 +16,7 @@ jobs:
       max-parallel: 1 # take advantage of caching
       matrix:
         target: [developer, runtime]
-        architecture: [linux]
+        architecture: [linux, rtems]
         include:
           - os: ubuntu-latest
             platforms: linux/amd64

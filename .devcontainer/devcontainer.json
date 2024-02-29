@@ -58,16 +58,6 @@
         // we also mount the project folder into a know location in the container
         // this is where the ibek-support and ioc folders reside in the container build
         // in this way the devcontainer and runtime look very similar
-        "source=${localWorkspaceFolder},target=/epics/generic-source,type=bind",
-        // this provides eternal bash history in and out of the container
-        "source=${localEnv:HOME}/.bash_eternal_history,target=/root/.bash_eternal_history,type=bind",
-        // this bashrc hooks up the .bashrc_dev_container in the following mount
-        "source=${localWorkspaceFolder}/.devcontainer/.bashrc,target=/root/.bashrc,type=bind",
-        // provides a place for you to put your shell customizations for all your dev containers
-        "source=${localEnv:HOME}/.bashrc_dev_container,target=/root/.bashrc_dev_container,type=bind",
-        // provides a place to install any packages you want to have across all your dev containers
-        "source=${localEnv:HOME}/.bashprofile_dev_container,target=/root/.bashprofile_dev_container,type=bind",
-        // provides the same command line editing experience as your host
-        "source=${localEnv:HOME}/.inputrc,target=/root/.inputrc,type=bind"
+        "source=${localWorkspaceFolder},target=/epics/generic-source,type=bind"
     ]
 }
