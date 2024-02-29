@@ -5,7 +5,7 @@
         "dockerfile": "../Dockerfile",
         "target": "developer",
         "args": {
-            "TARGET_ARCHITECTURE": "linux"
+            "TARGET_ARCHITECTURE": "rtems"
         }
     },
     "remoteEnv": {

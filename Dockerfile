@@ -33,17 +33,14 @@ RUN autosave/install.sh R5-11
 COPY ibek-support/busy/ busy/
 RUN busy/install.sh R1-7-3
 
-COPY ibek-support/sscan/ sscan/
-RUN sscan/install.sh R2-11-6
-
 COPY ibek-support/calc/ calc/
 RUN calc/install.sh R3-7-5
 
-COPY ibek-support/motor/ motor/
-RUN motor/install.sh R7-3-1
+# COPY ibek-support/motor/ motor/
+# RUN motor/install.sh R7-3-1
 
-COPY ibek-support/pmac/ pmac/
-RUN pmac/install.sh 2-6-2b1
+# COPY ibek-support/pmac/ pmac/
+# RUN pmac/install.sh 2-6-2b1
 
 # get the ioc source and build it
 COPY ioc ${SOURCE_FOLDER}/ioc
