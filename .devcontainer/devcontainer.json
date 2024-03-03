@@ -5,7 +5,7 @@
         "dockerfile": "../Dockerfile",
         "target": "developer",
         "args": {
-            "TARGET_ARCHITECTURE": "rtems"
+            "TARGET_ARCHITECTURE": "linux"
         }
     },
     "remoteEnv": {
@@ -39,11 +39,9 @@
             ]
         }
     },
-    // Make sure the files we are mapping into the container exist on the host
-    // You can place any other outside of the container before-launch commands here
+    // You can place any outside of the container before-launch commands here
     "initializeCommand": "bash .devcontainer/initializeCommand ${devcontainerId}",
-    // Hooks the global .bashprofile_dev_container but also can add any other commands
-    // to run in the container at creation in here
+    // One time global setup commands inside the container
     "postCreateCommand": "bash .devcontainer/postCreateCommand ${devcontainerId}",
     "runArgs": [
         // Allow the container to access the host X11 display and EPICS CA

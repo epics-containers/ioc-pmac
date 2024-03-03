@@ -16,17 +16,15 @@ set -xe
 
 cd $(dirname ${0})
 
-# use docker if available else use podman
+# use docker if available else use podman, also use buildx if available
 if ! docker version &>/dev/null; then docker=podman; else docker=docker; fi
-
-if ! $docker buildx version &>/dev/null; then
-    echo "buildx required. (install with 'apt install docker-buildx')"
-    exit 1
-fi
+if $docker buildx version &>/dev/null; then builx=buildx; load=--load; fi
 
 # make sure new repos get their submodule ibek-support
-git submodule update --init
+# allow failure so that we can rebuild with dirty submodules
+git submodule update --init || true
 
-# build and developer images
-$docker buildx build -t ${TAG} --build-arg TARGET_ARCHITECTURE=$T_A --target $TARGET .
+$docker $buildx build -t ${TAG} $load \
+    --build-arg TARGET_ARCHITECTURE=$T_A \
+    --target $TARGET .
 

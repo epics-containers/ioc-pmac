@@ -21,6 +21,7 @@ WORKDIR ${SOURCE_FOLDER}/ibek-support
 # copy the global ibek files
 COPY ibek-support/_global/ _global
 
+# TODO needs patching for rtems
 # COPY ibek-support/iocStats/ iocStats
 # RUN iocStats/install.sh 3.1.16
 
@@ -36,15 +37,15 @@ RUN busy/install.sh R1-7-3
 COPY ibek-support/calc/ calc/
 RUN calc/install.sh R3-7-5
 
-# COPY ibek-support/motor/ motor/
-# RUN motor/install.sh R7-3-1
+COPY ibek-support/motor/ motor/
+RUN motor/install.sh R7-3-1
 
-# COPY ibek-support/pmac/ pmac/
-# RUN pmac/install.sh 2-6-2b1
+COPY ibek-support/pmac/ pmac/
+RUN pmac/install.sh 2-6-2b1
 
 # get the ioc source and build it
 COPY ioc ${SOURCE_FOLDER}/ioc
-RUN cd ${IOC} && make
+RUN cd ${IOC} && ./install.sh && make
 
 ##### runtime preparation stage ################################################
 

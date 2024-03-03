@@ -23,7 +23,7 @@ echo 'source <(ibek --show-completion bash)' >> $HOME/.bashrc
 echo 'source <(ibek --show-completion zsh)' >> $HOME/.zshrc
 
 # pick a theme that does not cause completion corruption in zsh
-sed -i $HOME/.zshrc -e 's/ZSH_THEME="devcontainers"/ZSH_THEME="eastwood"/'
+sed -i $HOME/.zshrc -e 's/ZSH_THEME="devcontainers"/ZSH_THEME="dst"/'
 
 # allow personalization of all devcontainers in this subdirectory
 # by placing a .devcontainer_rc file in the workspace root
