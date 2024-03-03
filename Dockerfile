@@ -22,8 +22,8 @@ WORKDIR ${SOURCE_FOLDER}/ibek-support
 COPY ibek-support/_global/ _global
 
 # TODO needs patching for rtems
-# COPY ibek-support/iocStats/ iocStats
-# RUN iocStats/install.sh 3.1.16
+COPY ibek-support/iocStats/ iocStats
+RUN iocStats/install.sh 3.2.0
 
 COPY ibek-support/asyn/ asyn/
 RUN asyn/install.sh R4-42

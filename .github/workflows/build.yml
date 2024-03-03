@@ -53,6 +53,8 @@ jobs:
           load: true
 
       - name: Test image
+        # can't test rtems without some hardware to run on
+        if: ${{ matrix.architecture != 'rtems' }}
         run: tests/run-tests.sh
 
       - name: Push image
