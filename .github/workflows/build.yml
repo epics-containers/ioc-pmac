@@ -13,10 +13,9 @@ jobs:
       packages: write
     strategy:
       fail-fast: false
-      max-parallel: 1 # take advantage of caching
       matrix:
         target: [developer, runtime]
-        architecture: [linux]
+        architecture: [linux, rtems]
         include:
           - os: ubuntu-latest
             platforms: linux/amd64
@@ -53,6 +52,8 @@ jobs:
           load: true
 
       - name: Test image
+        # can't test rtems without some hardware to run on
+        if: ${{ matrix.architecture != 'rtems' }}
         run: tests/run-tests.sh
 
       - name: Push image

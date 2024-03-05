@@ -30,13 +30,23 @@ description='
  2. ioc.yaml *************************************************************
     If the config folder contains a yaml file we invoke the ibek tool to
     generate the startup script and database. Then launch with the generated
-    startup script. The file name should be the name of the ioc with a 'yaml'
-    extension e.g. bl38p-ea-panda-02.yaml. Using a unique name allows for:
+    startup script. The file name should always be 'ioc.yaml'. The ioc instance
+    can determine its own name with the following as the first line in 'ioc.yaml'
 
-        ioc_name: "{{ ioc_yaml_file_name }}"
+        ioc_name: ""{{ __utils__.get_env('IOC_NAME') }}""
 
     at the top of the file and in turn "{{ ioc_name }}"" can be used in any
-    of the fields within the file.
+    of the fields within the file. For example: by default Kubernetes will be
+    looking at the iocStats PV IOC_NAME:Uptime to validate health of the IOC,
+    therefore most IOC instances should include:
+
+        entities:
+        - type: epics.EpicsEnvSet
+            name: EPICS_TZ
+            value: "GMT0BST"
+
+        - type: devIocStats.iocAdminSoft
+            IOC: "{{ ioc_name | upper }}"
 
  3. st.cmd + ioc.subst *********************************************************
     If the config folder contains a st.cmd script and a ioc.subst file then
@@ -121,7 +131,7 @@ elif [ -f ${ibek_src} ]; then
 
     # get the ibek support yaml files this ioc's support modules
     defs=/epics/ibek-defs/*.ibek.support.yaml
-    ibek runtime generate ${ibek_src} ${defs} --out ${final_ioc_startup} --db-out ${db_src}
+    ibek runtime generate ${ibek_src} ${defs}
 
     # build expanded database using msi
     if [ -f ${db_src} ]; then
@@ -129,7 +139,7 @@ elif [ -f ${ibek_src} ]; then
         bash -c "msi -o${epics_db} ${includes} -I${RUNTIME_DIR} -S${db_src}"
     fi
 
-# 2. st.cmd + ioc.subst ************************************************
+# 3. st.cmd + ioc.subst ************************************************
 elif [ -f ${ioc_startup} ] ; then
 
     if [ -f ${CONFIG_DIR}/ioc.subst ]; then

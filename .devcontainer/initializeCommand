@@ -1,15 +1,6 @@
 #!/bin/bash
 
-# make sure all the files we mount into the container exist
-for i in \
-    .bash_eternal_history \
-    .bashrc_dev_container \
-    .bashprofile_dev_container \
-    .inputrc
-    do
-        if [ ! -f $HOME/$i ] ; then
-            touch $HOME/$i;
-        fi
-done
+# custom initialization goes here - runs outside of the dev container
+# just before the container is launched but after the container is created
 
 echo "devcontainerID ${1}"
