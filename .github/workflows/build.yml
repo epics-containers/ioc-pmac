@@ -16,24 +16,21 @@ jobs:
       matrix:
         epics-target: [RTEMS-beatnik, linux-x86_64, linux-arm]
         target: [developer, runtime]
+        os: [ubuntu-latest]
         include:
           - epics-target: RTEMS-beatnik
             epics-host: linux-x86_64
             image_name: rtems-beatnik
-            os: ubuntu-latest
             platform: linux/amd64
 
           - epics-target: linux-x86_64
             epics-host: linux-x86_64
             image_name: linux-x86_64
-            os: ubuntu-latest
             platform: linux/amd64
 
           - epics-target: linux-arm
             epics-host: linux-arm
             image_name: linux-arm
-            base_image: ubuntu:22.04
-            os: ubuntu-latest
             platform: linux/arm64
 
     runs-on: ${{ matrix.os }}
