@@ -20,21 +20,18 @@ jobs:
           - epics-target: RTEMS-beatnik
             epics-host: linux-x86_64
             image_name: rtems-beatnik
-            base_image: ghcr.io/epics-containers/rtems-beatnik-runtime:6.1rc2
             os: ubuntu-latest
             platform: linux/amd64
 
           - epics-target: linux-x86_64
             epics-host: linux-x86_64
             image_name: linux
-            base_image: ubuntu:22.04
             os: ubuntu-latest
             platform: linux/amd64
 
           - epics-target: linux-arm
             epics-host: linux-arm
             image_name: linux
-            base_image: ubuntu:22.04
             os: ubuntu-latest
             platform: linux/arm64
 
@@ -70,6 +67,7 @@ jobs:
           build-args: |
             TARGET_ARCHITECTURE=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
+            IMAGE_NAME=${{ matrix.image_name }}
           tags: ${{ env.TAG }}
           cache-from: type=gha,scope=${{ matrix.epics-target }}
           cache-to: type=gha,mode=max,scope=${{ matrix.epics-target }}
@@ -90,6 +88,7 @@ jobs:
           build-args: |
             TARGET_ARCHITECTURE=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
+            IMAGE_NAME=${{ matrix.image_name }}
           push: true
 
   release:
