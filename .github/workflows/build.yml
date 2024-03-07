@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  build-push-images:
+  build:
     # pull requests are a duplicate of a branch push if within the same repo.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     permissions:
@@ -15,15 +15,34 @@ jobs:
       fail-fast: false
       max-parallel: 1 # take advantage of caching
       matrix:
+        epics-target: [RTEMS-beatnik, linux-x86_64, linux-arm]
         target: [developer, runtime]
-        architecture: [linux, rtems]
         include:
-          - os: ubuntu-latest
-            platforms: linux/amd64
+          - epics-target: RTEMS-beatnik
+            epics-host: linux-x86_64
+            image_name: rtems-beatnik
+            base_image: ghcr.io/epics-containers/rtems-beatnik-runtime:6.1rc2
+            os: ubuntu-latest
+            platform: linux/amd64
+
+          - epics-target: linux-x86_64
+            epics-host: linux-x86_64
+            image_name: linux
+            base_image: ubuntu:22.04
+            os: ubuntu-latest
+            platform: linux/amd64
+
+          - epics-target: linux-arm
+            epics-host: linux-arm
+            image_name: linux
+            base_image: ubuntu:22.04
+            os: ubuntu-latest
+            platform: linux/arm64
+
 
     runs-on: ${{ matrix.os }}
     env:
-      TAG: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-${{ matrix.architecture }}-${{ matrix.target }}:${{ github.ref_name }}
+      TAG: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-${{  matrix.image_name }}-${{ matrix.target }}:${{ github.ref_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -37,6 +56,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -44,17 +66,19 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: ${{ matrix.platforms }}
+          platforms: ${{ matrix.platform }}
           target: ${{ matrix.target }}
-          build-args: TARGET_ARCHITECTURE=${{ matrix.architecture }}
+          build-args: |
+            TARGET_ARCHITECTURE=${{ matrix.epics-target }}
+            EPICS_HOST_ARCH=${{ matrix.epics-host }}
           tags: ${{ env.TAG }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.epics-target }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.epics-target }}
           load: true
 
       - name: Test image
         # can't test rtems without some hardware to run on
-        if: ${{ matrix.architecture != 'rtems' }}
+        if: contains(${{ matrix.epics-target }}, "RTEMS")
         run: tests/run-tests.sh
 
       - name: Push image
@@ -62,15 +86,16 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: ${{ matrix.platforms }}
+          platforms: ${{ matrix.platform }}
           target: ${{ matrix.target }}
-          build-args: TARGET_ARCHITECTURE=${{ matrix.architecture }}
-          tags: ${{ env.TAG }}
+          build-args: |
+            TARGET_ARCHITECTURE=${{ matrix.epics-target }}
+            EPICS_HOST_ARCH=${{ matrix.epics-host }}
           push: true
 
   release:
     # Release on tag push - publish ioc schema
-    needs: [build-push-images]
+    needs: [build]
     if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
 
