@@ -13,7 +13,6 @@ jobs:
       packages: write
     strategy:
       fail-fast: false
-      max-parallel: 1 # take advantage of caching
       matrix:
         epics-target: [RTEMS-beatnik, linux-x86_64, linux-arm]
         target: [developer, runtime]

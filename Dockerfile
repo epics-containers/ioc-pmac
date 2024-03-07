@@ -21,17 +21,23 @@ WORKDIR ${SOURCE_FOLDER}/ibek-support
 # copy the global ibek files
 COPY ibek-support/_global/ _global
 
+COPY ibek-support/sequencer sequencer
+RUN sequencer/install.sh R2-2-9
+
 COPY ibek-support/iocStats/ iocStats
 RUN iocStats/install.sh 3.2.0
 
 COPY ibek-support/asyn/ asyn/
-RUN asyn/install.sh R4-42
+RUN asyn/install.sh R4-44-2
 
 COPY ibek-support/autosave/ autosave/
 RUN autosave/install.sh R5-11
 
 COPY ibek-support/busy/ busy/
-RUN busy/install.sh R1-7-3
+RUN busy/install.sh R1-7-4
+
+COPY ibek-support/sscan/ sscan/
+RUN sscan/install.sh R2-11-6
 
 COPY ibek-support/calc/ calc/
 RUN calc/install.sh R3-7-5
