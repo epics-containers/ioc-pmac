@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        epics-target: [RTEMS-beatnik, linux-x86_64, linux-arm]
+        epics-target: [RTEMS-beatnik, linux-x86_64] # , linux-arm
         target: [developer, runtime]
         include:
           - epics-target: RTEMS-beatnik
@@ -29,12 +29,12 @@ jobs:
             os: ubuntu-latest
             platform: linux/amd64
 
-          - epics-target: linux-arm
-            epics-host: linux-arm
-            image_name: linux
-            base_image: ubuntu:22.04
-            os: ubuntu-latest
-            platform: linux/arm64
+          # - epics-target: linux-arm
+          #   epics-host: linux-arm
+          #   image_name: linux
+          #   base_image: ubuntu:22.04
+          #   os: ubuntu-latest
+          #   platform: linux/arm64
 
     runs-on: ${{ matrix.os }}
     env:
@@ -89,6 +89,7 @@ jobs:
             TARGET_ARCHITECTURE=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
             IMAGE_NAME=${{ matrix.image_name }}
+          tags: ${{ env.TAG }}
           push: true
 
   release:
