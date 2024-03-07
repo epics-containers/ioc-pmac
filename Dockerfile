@@ -4,7 +4,7 @@ ARG TARGET_ARCHITECTURE=linux-x86_64
 ARG EPICS_HOST_ARCH=linux-x86_64
 ARG IMAGE_NAME=linux
 
-ARG BASE=7.0.8ec1
+ARG BASE=7.0.8ec2b1
 ARG REGISTRY=ghcr.io/epics-containers
 
 FROM  ${REGISTRY}/epics-base-${IMAGE_NAME}-developer:${BASE} AS developer
