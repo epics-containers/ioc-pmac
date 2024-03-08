@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        epics-target: [RTEMS-beatnik, linux-x86_64] # , linux-aarch64]
+        epics-target: [RTEMS-beatnik, linux-x86_64, linux-aarch64]
         target: [developer, runtime]
         include:
           - epics-target: RTEMS-beatnik
@@ -25,16 +25,16 @@ jobs:
 
           - epics-target: linux-x86_64
             epics-host: linux-x86_64
-            extension:
+            extension: ""
             platform: linux/amd64
             os: ubuntu-latest
 
-          # - epics-target: linux-aarch64
-          #   epics-host: linux-aarch64
-          #   # a temporary name until multi-arch is supported
-          #   extension: -native-aarch64
-          #   platform: linux/arm64
-          #   os: ubuntu-latest
+          - epics-target: linux-aarch64
+            epics-host: linux-aarch64
+            # a temporary name until multi-arch is supported
+            extension: -native-aarch64
+            platform: linux/arm64
+            os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
     env:
@@ -67,7 +67,7 @@ jobs:
           build-args: |
             TARGET_ARCHITECTURE=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
-            IMAGE_NAME=${{ matrix.image_name }}
+            IMAGE_EXT=${{ matrix.extension }}
           tags: ${{ env.TAG }}
           cache-from: type=gha,scope=${{ matrix.epics-target }}
           cache-to: type=gha,mode=max,scope=${{ matrix.epics-target }}
@@ -98,9 +98,9 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
 
-    # this job runs in the (linux) developer container we just made
+    # this job runs in the native developer container we just made
     container:
-      image: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-linux-developer:${{ github.ref_name }}
+      image: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-developer:${{ github.ref_name }}
 
     steps:
       - name: generate-schema
