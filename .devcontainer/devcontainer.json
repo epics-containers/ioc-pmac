@@ -3,10 +3,7 @@
     "name": "epics-containers IOC devcontainer",
     "build": {
         "dockerfile": "../Dockerfile",
-        "target": "developer",
-        "args": {
-            "TARGET_ARCHITECTURE": "rtems"
-        }
+        "target": "developer"
     },
     "remoteEnv": {
         // allows X11 apps to run inside the container

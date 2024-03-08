@@ -2,12 +2,12 @@
 
 ARG TARGET_ARCHITECTURE=linux-x86_64
 ARG EPICS_HOST_ARCH=linux-x86_64
-ARG IMAGE_NAME=linux
+ARG IMAGE_EXT
 
 ARG BASE=7.0.8ec2b1
 ARG REGISTRY=ghcr.io/epics-containers
 
-FROM  ${REGISTRY}/epics-base-${IMAGE_NAME}-developer:${BASE} AS developer
+FROM  ${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE} AS developer
 
 # The devcontainer mounts the project root to /epics/generic-source
 # Using the same location here makes devcontainer/runtime differences transparent.
@@ -64,7 +64,7 @@ RUN ibek ioc extract-runtime-assets /assets ${SOURCE_FOLDER}/ibek*
 
 ##### runtime stage ############################################################
 
-FROM ${REGISTRY}/epics-base-${IMAGE_NAME}-runtime:${BASE} AS runtime
+FROM ${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE} AS runtime
 
 # get runtime assets from the preparation stage
 COPY --from=runtime_prep /assets /

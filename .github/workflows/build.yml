@@ -14,28 +14,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        epics-target: [RTEMS-beatnik, linux-x86_64, linux-arm]
+        epics-target: [RTEMS-beatnik, linux-x86_64, linux-aarch64]
         target: [developer, runtime]
-        os: [ubuntu-latest]
         include:
           - epics-target: RTEMS-beatnik
             epics-host: linux-x86_64
-            image_name: rtems-beatnik
+            extension: -rtems-beatnik
             platform: linux/amd64
+            os: ubuntu-latest
 
           - epics-target: linux-x86_64
             epics-host: linux-x86_64
-            image_name: linux-x86_64
+            extension:
             platform: linux/amd64
+            os: ubuntu-latest
 
-          - epics-target: linux-arm
-            epics-host: linux-arm
-            image_name: linux-arm
+          - epics-target: linux-aarch64
+            epics-host: linux-aarch64
+            # a temporary name until multi-arch is supported
+            extension: -native-aarch64
             platform: linux/arm64
+            os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
     env:
-      TAG: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-${{  matrix.image_name }}-${{ matrix.target }}:${{ github.ref_name }}
+      TAG: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}${{ matrix.extension }}-${{ matrix.target }}:${{ github.ref_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -85,7 +88,7 @@ jobs:
           build-args: |
             TARGET_ARCHITECTURE=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
-            IMAGE_NAME=${{ matrix.image_name }}
+            IMAGE_EXT=${{ matrix.extension }}
           tags: ${{ env.TAG }}
           push: true
 
