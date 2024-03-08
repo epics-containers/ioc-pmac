@@ -4,15 +4,19 @@
 # generic local build script for epics-containers repositories                 #
 ################################################################################
 
+# log commands and stop on errors
+set -xe
+
 # set TARGET_ARCHITECTURE to rtems for RTEMS based targets
-T_A=${TARGET_ARCHITECTURE:-linux}
+T_A=${TARGET_ARCHITECTURE:-linux_x86_64}
 # set TARGET to runtime for runtime images
 TARGET=${TARGET:-developer}
 # set TAG to override the default tag
 TAG=${TAG:-ec_test}
-
-# log commands and stop on errors
-set -xe
+if [[ ${T_A} != "linux_x86_64" ]]; then
+    # container image extension is the lcase of TARGET_ARCHITECTURE
+    IMAGE_EXT=-"${T_A,,}"
+fi
 
 cd $(dirname ${0})
 
@@ -24,5 +28,7 @@ if $docker buildx version &>/dev/null; then builx=buildx; load=--load; fi
 if [ ! -d ibek-support ] ; then git submodule update --init ; fi
 
 # build and developer images
-$docker build $buildx -t ${TAG} --build-arg \
-    TARGET_ARCHITECTURE=$T_A $load --target $TARGET .
+$docker build $buildx -t ${TAG} "${@}"  $load \
+    --build-arg TARGET_ARCHITECTURE=$T_A \
+    --build-arg IMAGE_EXT=$IMAGE_EXT \
+    --target $TARGET .

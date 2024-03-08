@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        epics-target: [RTEMS-beatnik, linux-x86_64, linux-aarch64]
+        epics-target: [RTEMS-beatnik, linux-x86_64] # , linux-aarch64]
         target: [developer, runtime]
         include:
           - epics-target: RTEMS-beatnik
@@ -29,12 +29,12 @@ jobs:
             platform: linux/amd64
             os: ubuntu-latest
 
-          - epics-target: linux-aarch64
-            epics-host: linux-aarch64
-            # a temporary name until multi-arch is supported
-            extension: -native-aarch64
-            platform: linux/arm64
-            os: ubuntu-latest
+          # - epics-target: linux-aarch64
+          #   epics-host: linux-aarch64
+          #   # a temporary name until multi-arch is supported
+          #   extension: -native-aarch64
+          #   platform: linux/arm64
+          #   os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
     env:
