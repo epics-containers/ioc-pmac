@@ -23,7 +23,7 @@ jobs:
             epics-host: linux-x86_64
             extension: -rtems-beatnik
             platform: linux/amd64
-            proxy: "ubuntu:20.04"
+            proxy: "python:3.12.2-alpine3.19"
 
           - epics-target: linux-x86_64
             epics-host: linux-x86_64

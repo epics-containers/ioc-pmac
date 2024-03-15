@@ -76,8 +76,15 @@ ENTRYPOINT ["/bin/bash", "-c", "${IOC}/start.sh"]
 FROM ${PROXY} as proxy
 
 # TODO - make extract-runtime-assets proxy aware and do these for us? maybe?
-COPY --from=developer /epics/ioc/bin/${EPICS_HOST_ARCH}/* /epics/ioc
+# TODO - YES!! in fact lets make this reuse the runtime target and get
+# 'ibek support apt-install' and 'ibek ioc extract-runtime-assets' to change their
+# behaviour based on TARGET_ARCHITECTURE==EPICS_HOST_ARCH
+COPY --from=developer /epics/ioc /epics/ioc
 COPY --from=developer ${SOURCE_FOLDER}/ibek*  ${SOURCE_FOLDER}/ibek*
 COPY --from=developer /epics/*-defs /epics/
 
-ENTRYPOINT ["/bin/bash", "-c", "/start.sh"]
+# TODO this will all be embedded in the PROXY image -remove from ioc-pmac when done
+RUN pip install ibek
+
+
+ENTRYPOINT ["/bin/bash", "-c", "${IOC}/config/rtems.start.sh"]
