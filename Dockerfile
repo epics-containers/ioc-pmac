@@ -1,12 +1,12 @@
-##### build stage ##############################################################
-
 ARG TARGET_ARCHITECTURE=linux-x86_64
 ARG EPICS_HOST_ARCH=linux-x86_64
 ARG IMAGE_EXT
+ARG PROXY
 
 ARG BASE=7.0.8ec2b1
 ARG REGISTRY=ghcr.io/epics-containers
 
+##### build stage ##############################################################
 FROM  ${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE} AS developer
 
 # The devcontainer mounts the project root to /epics/generic-source
@@ -56,14 +56,12 @@ COPY ioc ${SOURCE_FOLDER}/ioc
 RUN cd ${IOC} && ./install.sh && make
 
 ##### runtime preparation stage ################################################
-
 FROM developer AS runtime_prep
 
 # get the products from the build stage and reduce to runtime assets only
 RUN ibek ioc extract-runtime-assets /assets ${SOURCE_FOLDER}/ibek*
 
 ##### runtime stage ############################################################
-
 FROM ${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE} AS runtime
 
 # get runtime assets from the preparation stage
@@ -72,6 +70,14 @@ COPY --from=runtime_prep /assets /
 # install runtime system dependencies, collected from install.sh scripts
 RUN ibek support apt-install --runtime
 
-ENV TARGET_ARCHITECTURE ${IMAGE_NAME}
-
 ENTRYPOINT ["/bin/bash", "-c", "${IOC}/start.sh"]
+
+##### proxy stage ##############################################################
+FROM ${PROXY} as proxy
+
+# TODO - make extract-runtime-assets proxy aware and do these for us? maybe?
+COPY --from=developer /epics/ioc/bin/${EPICS_HOST_ARCH}/* /epics/ioc
+COPY --from=developer ${SOURCE_FOLDER}/ibek*  ${SOURCE_FOLDER}/ibek*
+COPY --from=developer /epics/*-defs /epics/
+
+ENTRYPOINT ["/bin/bash", "-c", "/start.sh"]
