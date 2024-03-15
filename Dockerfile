@@ -87,4 +87,4 @@ COPY --from=developer /epics/*-defs /epics/
 RUN pip install ibek
 
 
-ENTRYPOINT ["/bin/bash", "-c", "${IOC}/config/rtems.start.sh"]
+ENTRYPOINT ["/bin/sh", "-c", "${IOC}/config/rtems.start.sh"]
