@@ -1,10 +1,10 @@
 ARG TARGET_ARCHITECTURE=linux-x86_64
 ARG EPICS_HOST_ARCH=linux-x86_64
 ARG IMAGE_EXT
-ARG PROXY
 
 ARG BASE=7.0.8ec2b1
 ARG REGISTRY=ghcr.io/epics-containers
+ARG RUNTIME=${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE}
 
 ##### build stage ##############################################################
 FROM  ${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE} AS developer
@@ -62,7 +62,7 @@ FROM developer AS runtime_prep
 RUN ibek ioc extract-runtime-assets /assets ${SOURCE_FOLDER}/ibek*
 
 ##### runtime stage ############################################################
-FROM ${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE} AS runtime
+FROM ${RUNTIME} AS runtime
 
 # get runtime assets from the preparation stage
 COPY --from=runtime_prep /assets /
@@ -72,19 +72,3 @@ RUN ibek support apt-install --runtime
 
 ENTRYPOINT ["/bin/bash", "-c", "${IOC}/start.sh"]
 
-##### proxy stage ##############################################################
-FROM ${PROXY} as proxy
-
-# TODO - make extract-runtime-assets proxy aware and do these for us? maybe?
-# TODO - YES!! in fact lets make this reuse the runtime target and get
-# 'ibek support apt-install' and 'ibek ioc extract-runtime-assets' to change their
-# behaviour based on TARGET_ARCHITECTURE==EPICS_HOST_ARCH
-COPY --from=developer /epics/ioc /epics/ioc
-COPY --from=developer ${SOURCE_FOLDER}/ibek*  ${SOURCE_FOLDER}/ibek*
-COPY --from=developer /epics/*-defs /epics/
-
-# TODO this will all be embedded in the PROXY image -remove from ioc-pmac when done
-RUN pip install ibek
-
-
-ENTRYPOINT ["/bin/sh", "-c", "${IOC}/config/rtems.start.sh"]

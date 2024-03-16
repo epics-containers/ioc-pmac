@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         epics-target: [RTEMS-beatnik, linux-x86_64] # , linux-aarch64]
-        target: [developer, runtime, proxy]
+        target: [developer, runtime]
         include:
           - os: ubuntu-latest # everyone is on os-latest
 
@@ -23,27 +23,19 @@ jobs:
             epics-host: linux-x86_64
             extension: -rtems-beatnik
             platform: linux/amd64
-            proxy: "python:3.12.2-alpine3.19"
+            runtime: "RUNTIME=python:3.12.2-alpine3.19"
 
           - epics-target: linux-x86_64
             epics-host: linux-x86_64
             extension: ""
             platform: linux/amd64
-            proxy: "none"
+            runtime: ""
 
           # - epics-target: linux-aarch64
           #   epics-host: linux-aarch64
           #   # a temporary name until multi-arch is supported
           #   extension: -native-aarch64
           #   platform: linux/arm64
-
-        exclude:
-          # only native images need a runtime target
-          - epics-target: RTEMS-beatnik
-            target: runtime
-          # only cross compiled images need a proxy target
-          - epics-target: linux-x86_64
-            target: proxy
 
     runs-on: ${{ matrix.os }}
     env:
@@ -77,15 +69,15 @@ jobs:
             TARGET_ARCHITECTURE=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
             IMAGE_EXT=${{ matrix.extension }}
-            PROXY=${{ matrix.proxy }}
+            ${{ matrix.runtime }}
           tags: ${{ env.TAG }}
-          cache-from: type=gha,scope=${{ matrix.epics-target }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.epics-target }}
+          cache-from: type=gha,scope=${{ matrix.epics-target }}-${{ matrix.target }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.epics-target }}-${{ matrix.target }}
           load: true
 
       - name: Test image
         # can't test non native without some hardware to run on
-        if: ${{ matrix.proxy == 'none' }}
+        if: ${{ matrix.runtime == '' }}
         run: tests/run-tests.sh
 
       - name: Push image
@@ -99,7 +91,7 @@ jobs:
             TARGET_ARCHITECTURE=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
             IMAGE_EXT=${{ matrix.extension }}
-            PROXY=${{ matrix.proxy }}
+            ${{ matrix.runtime }}
           tags: ${{ env.TAG }}
           push: true
 
