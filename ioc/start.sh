@@ -73,7 +73,7 @@ function ibek_error {
     echo "${1}"
 
     # Wait for a bit so the container does not exit and restart continually
-    sleep 10
+    sleep 120
 }
 
 # environment setup ************************************************************
