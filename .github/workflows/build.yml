@@ -23,7 +23,7 @@ jobs:
             epics-host: linux-x86_64
             extension: -rtems-beatnik
             platform: linux/amd64
-            runtime: "RUNTIME=python:3.12.2-alpine3.19"
+            runtime: "RUNTIME=ghcr.io/epics-containers/rtems-proxy:0.1.4"
 
           - epics-target: linux-x86_64
             epics-host: linux-x86_64

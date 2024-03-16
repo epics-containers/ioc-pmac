@@ -70,7 +70,5 @@ COPY --from=runtime_prep /assets /
 # install runtime system dependencies, collected from install.sh scripts
 RUN ibek support apt-install --runtime
 
-RUN chmod +x ${IOC}/start.sh
-
 ENTRYPOINT ["bash", "-c", "${IOC}/start.sh"]
 
