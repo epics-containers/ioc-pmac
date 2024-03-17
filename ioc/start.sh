@@ -160,7 +160,12 @@ if [[ ${TARGET_ARCHITECTURE} == "linux-x86_64" ]] ; then
     exec ${IOC}/bin/linux-x86_64/ioc ${final_ioc_startup}
 else
     # not native architectures will have a proxy-start.sh in the root
-    /proxy-start.sh
+    if [[ -f ${CONFIG_DIR}/proxy-start.sh ]]; then
+        # instances can provide their own proxy-start ovedrride in config
+        bash ${CONFIG_DIR}/proxy-start.sh
+    fi
+    # the proxy container will provide a default proxy-start.sh in the root
+    bash /proxy-start.sh
 fi
 
 
