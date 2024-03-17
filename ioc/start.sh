@@ -158,8 +158,9 @@ fi
 if [[ ${TARGET_ARCHITECTURE} == "linux-x86_64" ]] ; then
     # Execute the IOC binary and pass the startup script as an argument
     exec ${IOC}/bin/linux-x86_64/ioc ${final_ioc_startup}
+else
+    # not native architectures will have a proxy-start.sh in the root
+    /proxy-start.sh
 fi
-
-# Non-linux architectures will now return to the calling script
 
 
