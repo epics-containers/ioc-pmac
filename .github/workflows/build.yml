@@ -66,7 +66,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           target: ${{ matrix.target }}
           build-args: |
-            TARGET_ARCHITECTURE=${{ matrix.epics-target }}
+            EPICS_TARGET_ARCH=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
             IMAGE_EXT=${{ matrix.extension }}
             ${{ matrix.runtime }}
@@ -88,7 +88,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           target: ${{ matrix.target }}
           build-args: |
-            TARGET_ARCHITECTURE=${{ matrix.epics-target }}
+            EPICS_TARGET_ARCH=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
             IMAGE_EXT=${{ matrix.extension }}
             ${{ matrix.runtime }}

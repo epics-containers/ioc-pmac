@@ -6,15 +6,15 @@
 
 set -e
 
-# set TARGET_ARCHITECTURE to rtems for RTEMS based targets
-T_A=${TARGET_ARCHITECTURE:-linux_x86_64}
+# set EPICS_TARGET_ARCH to rtems for RTEMS based targets
+T_A=${EPICS_TARGET_ARCH:-linux_x86_64}
 # set TARGET to runtime for runtime images
 TARGET=${TARGET:-developer}
 # set TAG to override the default tag
 TAG=${TAG:-ec_test}
 
 if [[ ${T_A} != "linux_x86_64" ]]; then
-    # container image extension is the lcase of TARGET_ARCHITECTURE
+    # container image extension is the lcase of EPICS_TARGET_ARCH
     IMAGE_EXT=-"${T_A,,}"
     if [ "$T_A" = "RTEMS-beatnik" ]; then
         runtime="--build-arg RUNTIME=ghcr.io/epics-containers/rtems-proxy"
@@ -33,6 +33,6 @@ if [ ! -d ibek-support ] ; then git submodule update --init ; fi
 # build and developer images
 set -x
 $docker build $buildx -t ${TAG} "${@}" $load \
-    --build-arg TARGET_ARCHITECTURE=$T_A \
+    --build-arg EPICS_TARGET_ARCH=$T_A \
     --build-arg IMAGE_EXT=$IMAGE_EXT \
     $runtime --target $TARGET .
