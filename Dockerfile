@@ -1,13 +1,14 @@
-ARG TARGET_ARCHITECTURE=linux-x86_64
+ARG EPICS_TARGET_ARCH=linux-x86_64
 ARG EPICS_HOST_ARCH=linux-x86_64
 ARG IMAGE_EXT
 
-ARG BASE=7.0.8ec2b1
+ARG BASE=7.0.8ec2b3
 ARG REGISTRY=ghcr.io/epics-containers
 ARG RUNTIME=${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE}
+ARG DEVELOPER=${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE}
 
 ##### build stage ##############################################################
-FROM  ${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE} AS developer
+FROM  ${DEVELOPER} AS developer
 
 # The devcontainer mounts the project root to /epics/generic-source
 # Using the same location here makes devcontainer/runtime differences transparent.
@@ -15,7 +16,7 @@ ENV SOURCE_FOLDER=/epics/generic-source
 # connect ioc source folder to its know location
 RUN ln -s ${SOURCE_FOLDER}/ioc ${IOC}
 
-# Get latest ibek while in development. Will come from epics-base when stable
+# Get the current version of ibek
 COPY requirements.txt requirements.txt
 RUN pip install --upgrade -r requirements.txt
 
@@ -66,6 +67,10 @@ FROM ${RUNTIME} AS runtime
 
 # get runtime assets from the preparation stage
 COPY --from=runtime_prep /assets /
+
+# Get the current version of ibek
+COPY requirements.txt requirements.txt
+RUN pip install --upgrade -r requirements.txt
 
 # install runtime system dependencies, collected from install.sh scripts
 RUN ibek support apt-install --runtime
