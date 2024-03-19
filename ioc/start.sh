@@ -149,8 +149,12 @@ elif [ -f ${ioc_startup} ] ; then
     final_ioc_startup=${ioc_startup}
 # 4. incorrect config folder ***************************************************
 else
-    echo "ERROR: No startup assets found in ${CONFIG_DIR}"
-    ibek_error "${description}"
+    ibek_error "
+    ${description}
+
+    ERROR: No IOC Instance Startup Assets found in ${CONFIG_DIR}
+    Please add ioc.yaml to the config folder (or see above for other options).
+    "
 fi
 
 # Launch the IOC ***************************************************************
@@ -163,9 +167,10 @@ else
     if [[ -f ${CONFIG_DIR}/proxy-start.sh ]]; then
         # instances can provide their own proxy-start ovedrride in config
         bash ${CONFIG_DIR}/proxy-start.sh
+    else
+        # the proxy container will provide a default proxy-start.sh in the root
+        bash /proxy-start.sh
     fi
-    # the proxy container will provide a default proxy-start.sh in the root
-    bash /proxy-start.sh
 fi
 
 
