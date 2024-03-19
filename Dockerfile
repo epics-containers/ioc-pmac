@@ -73,7 +73,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --upgrade -r requirements.txt
 
 # install runtime system dependencies, collected from install.sh scripts
-RUN ibek support apt-install --runtime
+RUN ibek support runtime-apt-install
 
 ENTRYPOINT ["bash", "-c", "${IOC}/start.sh"]
 
