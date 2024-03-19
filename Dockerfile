@@ -2,7 +2,7 @@ ARG EPICS_TARGET_ARCH=linux-x86_64
 ARG EPICS_HOST_ARCH=linux-x86_64
 ARG IMAGE_EXT
 
-ARG BASE=7.0.8ec2b3
+ARG BASE=7.0.8ec2b4
 ARG REGISTRY=ghcr.io/epics-containers
 ARG RUNTIME=${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE}
 ARG DEVELOPER=${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE}
@@ -60,7 +60,8 @@ RUN cd ${IOC} && ./install.sh && make
 FROM developer AS runtime_prep
 
 # get the products from the build stage and reduce to runtime assets only
-RUN ibek ioc extract-runtime-assets /assets ${SOURCE_FOLDER}/ibek*
+# TODO should ibek* and /venv be default assets in ibek?
+RUN ibek ioc extract-runtime-assets /assets ${SOURCE_FOLDER}/ibek* /venv
 
 ##### runtime stage ############################################################
 FROM ${RUNTIME} AS runtime
@@ -68,12 +69,10 @@ FROM ${RUNTIME} AS runtime
 # get runtime assets from the preparation stage
 COPY --from=runtime_prep /assets /
 
-# Get the current version of ibek
-COPY requirements.txt requirements.txt
-RUN pip install --upgrade -r requirements.txt
-
 # install runtime system dependencies, collected from install.sh scripts
 RUN ibek support apt-install-runtime-packages --skip-non-native
+# install runtime proxy for non-native builds
+RUN bash ${IOC}/install_proxy.sh
 
 ENTRYPOINT ["bash", "-c", "${IOC}/start.sh"]
 

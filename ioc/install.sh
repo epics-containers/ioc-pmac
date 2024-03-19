@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# global install script for support all support modules to reference
+# global install script for all support modules to reference
+# every install.sh script in ibek-support should call this script
+# before it compiles its support module.
 
 x86_cfg='./configure/CONFIG_SITE.Common.linux-x86_64'
 
