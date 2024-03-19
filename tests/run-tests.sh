@@ -5,6 +5,7 @@
 # all present and correct and that mounting IOC config or ibek config
 # works as expected.
 
+TAG=${1}
 THIS=$(realpath $(dirname $0))
 ROOT=$(realpath ${THIS}/..)
 CONF=/epics/ioc/config

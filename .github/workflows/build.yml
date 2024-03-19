@@ -15,7 +15,6 @@ jobs:
       fail-fast: false
       matrix:
         epics-target: [RTEMS-beatnik, linux-x86_64] # , linux-aarch64]
-        target: [developer, runtime]
         include:
           - os: ubuntu-latest # everyone is on os-latest
 
@@ -39,7 +38,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     env:
-      TAG: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}${{ matrix.extension }}-${{ matrix.target }}:${{ github.ref_name }}
+      TAG: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}${{ matrix.extension }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -64,35 +63,50 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          target: ${{ matrix.target }}
+          target: runtime
           build-args: |
             EPICS_TARGET_ARCH=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
             IMAGE_EXT=${{ matrix.extension }}
             ${{ matrix.runtime }}
-          tags: ${{ env.TAG }}
           cache-from: type=gha,scope=${{ matrix.epics-target }}-${{ matrix.target }}
           cache-to: type=gha,mode=max,scope=${{ matrix.epics-target }}-${{ matrix.target }}
+          tags: ci_test
           load: true
 
       - name: Test image
         # can't test non native without some hardware to run on
         if: ${{ matrix.runtime == '' }}
-        run: tests/run-tests.sh
+        run: tests/run-tests.sh ci_test
 
-      - name: Push image
+      - name: Push developer image
         if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          target: ${{ matrix.target }}
+          target: developer
           build-args: |
             EPICS_TARGET_ARCH=${{ matrix.epics-target }}
             EPICS_HOST_ARCH=${{ matrix.epics-host }}
             IMAGE_EXT=${{ matrix.extension }}
             ${{ matrix.runtime }}
-          tags: ${{ env.TAG }}
+          tags: ${{ env.TAG }}-developer:${{ github.ref_name }}
+          push: true
+
+      - name: Push runtime image
+        if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          target: runtime
+          build-args: |
+            EPICS_TARGET_ARCH=${{ matrix.epics-target }}
+            EPICS_HOST_ARCH=${{ matrix.epics-host }}
+            IMAGE_EXT=${{ matrix.extension }}
+            ${{ matrix.runtime }}
+          tags: ${{ env.TAG }}-runtime:${{ github.ref_name }}
           push: true
 
   release:
