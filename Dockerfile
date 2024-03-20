@@ -57,7 +57,8 @@ COPY ioc ${SOURCE_FOLDER}/ioc
 RUN cd ${IOC} && ./install.sh && make
 
 # install runtime proxy for non-native builds
-RUN bash ${IOC}/install_proxy.sh
+RUN if [ EPICS_TARGET_ARCH != "linux_x86-64" ] ; then \
+    pip install rtems-proxy==0.2.2; fi
 
 ##### runtime preparation stage ################################################
 FROM developer AS runtime_prep
