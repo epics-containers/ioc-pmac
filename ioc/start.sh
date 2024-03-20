@@ -163,13 +163,13 @@ if [[ ${EPICS_TARGET_ARCH} == "linux-x86_64" ]] ; then
     # Execute the IOC binary and pass the startup script as an argument
     exec ${IOC}/bin/linux-x86_64/ioc ${final_ioc_startup}
 else
-    # not native architectures will have a proxy-start.sh in the root
+    # for not native architectures use the appropriate python package
     if [[ -f ${CONFIG_DIR}/proxy-start.sh ]]; then
-        # instances can provide their own proxy-start ovedrride in config
+        # instances can provide proxy-start.sh to ovedrride default behavior
         bash ${CONFIG_DIR}/proxy-start.sh
     else
         # the proxy container will provide a default proxy-start.sh in the root
-        bash /proxy-start.sh
+        rtems-proxy
     fi
 fi
 
