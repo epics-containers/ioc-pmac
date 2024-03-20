@@ -170,6 +170,14 @@ else
     else
         # the proxy container will provide a default proxy-start.sh in the root
         rtems-proxy start
+
+        # TODO - probably do not need this when the proxy is working?
+        echo "Proxy exited pausing container for debugging ..."
+
+        # keep the container running ...
+        while true; do
+          sleep 2
+        done
     fi
 fi
 
