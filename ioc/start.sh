@@ -169,7 +169,7 @@ else
         bash ${CONFIG_DIR}/proxy-start.sh
     else
         # the proxy container will provide a default proxy-start.sh in the root
-        rtems-proxy
+        rtems-proxy start
     fi
 fi
 
