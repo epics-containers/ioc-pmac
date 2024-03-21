@@ -1,8 +1,6 @@
-ARG EPICS_TARGET_ARCH=linux-x86_64
-ARG EPICS_HOST_ARCH=linux-x86_64
 ARG IMAGE_EXT
 
-ARG BASE=7.0.8ec2b5
+ARG BASE=7.0.8ec2b6
 ARG REGISTRY=ghcr.io/epics-containers
 ARG RUNTIME=${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE}
 ARG DEVELOPER=${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE}
