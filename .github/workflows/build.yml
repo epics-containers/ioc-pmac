@@ -18,15 +18,18 @@ jobs:
         include:
           - os: ubuntu-latest # everyone is on ubuntu-latest
 
-          - extension: -rtems-beatnik
+          - epics-target: RTEMS-beatnik
+            extension: -rtems-beatnik
             platform: linux/amd64
 
-          - extension: ""
+          - epics-target: linux-x86_64
+            extension: ""
             platform: linux/amd64
 
-          # -  # a temporary name until multi-arch is supported
-          #   extension: -native-aarch64
-          #   platform: linux/arm64
+          # # a temporary name until multi-arch is supported
+          # - epics-target: linux-aarch64
+          #     extension: -native-aarch64
+          #     platform: linux/arm64
 
     runs-on: ${{ matrix.os }}
     env:
