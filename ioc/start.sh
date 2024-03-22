@@ -165,19 +165,14 @@ if [[ ${EPICS_TARGET_ARCH} == "linux-x86_64" ]] ; then
 else
     # for not native architectures use the appropriate python package
     if [[ -f ${CONFIG_DIR}/proxy-start.sh ]]; then
-        # instances can provide proxy-start.sh to ovedrride default behavior
+        # instances can provide proxy-start.sh to override default behavior
         bash ${CONFIG_DIR}/proxy-start.sh
     else
-        # the proxy container will provide a default proxy-start.sh in the root
+        # the RTEMS container provides a python package to:
+        # - copy binaries to the IOC's shared folder
+        # - remotely configure the boot parameters
+        # - remotely launch the IOC
         rtems-proxy start
-
-        # TODO - probably do not need this when the proxy is working?
-        echo "Proxy exited pausing container for debugging ..."
-
-        # keep the container running ...
-        while true; do
-          sleep 2
-        done
     fi
 fi
 
