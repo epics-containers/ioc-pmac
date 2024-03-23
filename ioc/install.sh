@@ -11,10 +11,6 @@ if [[ $EPICS_TARGET_ARCH == "RTEMS"* ]]; then
     touch ${x86_cfg}
     sed -i '/VALID_BUILDS/d' ${x86_cfg}
     echo "VALID_BUILDS=Host" >> ${x86_cfg}
-
-    # TODO move this to epics-base?
-    apt-get update
-    apt-get -y install inotify-tools
 fi
 
 

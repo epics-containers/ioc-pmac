@@ -1,6 +1,6 @@
 ARG IMAGE_EXT
 
-ARG BASE=7.0.8ec2b6
+ARG BASE=7.0.8ec2b7
 ARG REGISTRY=ghcr.io/epics-containers
 ARG RUNTIME=${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE}
 ARG DEVELOPER=${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE}
