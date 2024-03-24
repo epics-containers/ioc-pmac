@@ -16,3 +16,6 @@ ioc/config
 
 # podman may leave this around in aborted builds
 .build.swp
+
+# this gets updated during RTEMS builds
+ioc/configure/CONFIG_SITE.Common.linux-x86_64
