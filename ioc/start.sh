@@ -57,7 +57,6 @@ description='
  4. empty config folder *******************************************************
     If the config folder is empty this message will be displayed.
 
-
  RTEMS IOCS - RTEMS IOC startup files can be generated using any of the above.
 
  For RTEMS we do not execute the ioc inside of the pod. Instead we:
@@ -74,7 +73,7 @@ function ibek_error {
     echo "${1}"
 
     # Wait for a bit so the container does not exit and restart continually
-    sleep 10
+    sleep 120
 }
 
 # environment setup ************************************************************
@@ -150,18 +149,31 @@ elif [ -f ${ioc_startup} ] ; then
     final_ioc_startup=${ioc_startup}
 # 4. incorrect config folder ***************************************************
 else
-    echo "ERROR: No startup assets found in ${CONFIG_DIR}"
-    ibek_error "${description}"
+    ibek_error "
+    ${description}
+
+    ERROR: No IOC Instance Startup Assets found in ${CONFIG_DIR}
+    Please add ioc.yaml to the config folder (or see above for other options).
+    "
 fi
 
 # Launch the IOC ***************************************************************
 
-if [[ ${TARGET_ARCHITECTURE} == "rtems" ]] ; then
-    echo "RTEMS IOC startup - copying IOC to RTEMS mount point ..."
-    cp -r ${IOC} ${K8S_IOC_ROOT}
-    sleep 100
-else
+if [[ ${EPICS_TARGET_ARCH} == "linux-x86_64" ]] ; then
     # Execute the IOC binary and pass the startup script as an argument
     exec ${IOC}/bin/linux-x86_64/ioc ${final_ioc_startup}
+else
+    # for not native architectures use the appropriate python package
+    if [[ -f ${CONFIG_DIR}/proxy-start.sh ]]; then
+        # instances can provide proxy-start.sh to override default behavior
+        bash ${CONFIG_DIR}/proxy-start.sh
+    else
+        # the RTEMS container provides a python package to:
+        # - copy binaries to the IOC's shared folder
+        # - remotely configure the boot parameters
+        # - remotely launch the IOC
+        rtems-proxy start
+    fi
 fi
+
 

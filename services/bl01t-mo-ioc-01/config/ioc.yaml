@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ioc-pmac/releases/download/2024.1.2/ibek.ioc.schema.json
+ioc_name: bl01t-mo-ioc-01
+
+description: |
+  Test IOC instance for pmac generic IOC.
+  Connects to the test pmac clipper under giles' desk
+
+entities:
+  - type: epics.EpicsEnvSet
+    name: EPICS_TZ
+    value: "GMT0BST"
+
+  - type: devIocStats.iocAdminSoft
+    IOC: "{{ ioc_name | upper }}"
+
+  - type: pmac.pmacAsynIPPort
+    IP: 172.23.240.97:1025
+    name: BRICK1port
+
+  - type: pmac.GeoBrick
+    IdlePoll: 1000
+    NAXES: 4
+    P: BL47P-MO-BRICK-01
+    name: BRICK1
+    pmacAsynPort: BRICK1port
+
+  - type: pmac.dls_pmac_asyn_motor
+    is_cs: false
+    ACCL: 0.1
+    ADDR: 1
+    Controller: BRICK1
+    DESC: Motor 1
+    DHLM: 25
+    DLLM: -25
+    EGU: mm
+    M: :MOTOR1
+    MRES: -0.01
+    P: BL01T-MO-BRICK-01
+    VELO: 4
+
+  - type: pmac.dls_pmac_asyn_motor
+    is_cs: false
+    ACCL: 0.1
+    ADDR: 2
+    Controller: BRICK1
+    DESC: Motor 1
+    DHLM: 25
+    DLLM: -25
+    EGU: mm
+    M: :MOTOR2
+    MRES: -0.01
+    P: BL01T-MO-BRICK-01
+    VELO: 4
+
+  # test clipper has 3 coordinate systems configured and pmac will segfault at
+  # present if these are not configured.
+  - type: pmac.CS
+    CS: 1
+    IdlePoll: 1000
+    PmacController: BRICK1
+    name: CS2
+  - type: pmac.CS
+    CS: 2
+    IdlePoll: 1000
+    PmacController: BRICK1
+    name: CS1
+  - type: pmac.CS
+    CS: 3
+    IdlePoll: 1000
+    PmacController: BRICK1
+    name: CS3

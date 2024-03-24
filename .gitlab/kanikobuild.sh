@@ -19,7 +19,7 @@ else
   DESTINATION=$CI_PROD_REGISTRY/$PROJECT_PATH/$CI_PROJECT_NAME
 fi
 
-CMDROOT="/kaniko/executor --context $CI_PROJECT_DIR --build-arg TARGET_ARCHITECTURE=${ARCH}"
+CMDROOT="/kaniko/executor --context $CI_PROJECT_DIR --build-arg EPICS_TARGET_ARCH=${ARCH}"
 CMD=$CMDROOT"  --target ${TARGET}"
 CMD=$CMD" --destination $DESTINATION-${ARCH}-${TARGET}:$CI_COMMIT_TAG"
 
