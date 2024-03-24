@@ -18,4 +18,4 @@ ioc/config
 .build.swp
 
 # this gets updated during RTEMS builds
-ioc/configure/CONFIG_SITE.Common.linux-x86_64
+**/CONFIG_SITE.Common.linux-x86_64
