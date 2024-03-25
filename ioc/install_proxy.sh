@@ -17,7 +17,7 @@
 # so proxy installation is not required.
 
 if [[ $EPICS_TARGET_ARCH == "RTEMS-beatnik" ]] ; then
-    pip install rtems-proxy=="0.3.1"
+    pip install rtems-proxy=="0.5.0"
 fi
 
 # no other proxies supported at present
