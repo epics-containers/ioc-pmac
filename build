@@ -16,9 +16,6 @@ TAG=${TAG:-ec_test}
 if [[ ${T_A} != "linux_x86_64" ]]; then
     # container image extension is the lcase of EPICS_TARGET_ARCH
     IMAGE_EXT=-"${T_A,,}"
-    if [ "$T_A" = "RTEMS-beatnik" ]; then
-        runtime="--build-arg RUNTIME=ghcr.io/epics-containers/rtems-proxy"
-    fi
 fi
 
 cd $(dirname ${0})
@@ -28,11 +25,10 @@ if ! docker version &>/dev/null; then docker=podman; else docker=docker; fi
 if $docker buildx version &>/dev/null; then builx=buildx; load=--load; fi
 
 # make sure new repos get their submodule ibek-support
-if [ ! -d ibek-support ] ; then git submodule update --init ; fi
+if [ ! -d ibek-support/_globals ] ; then git submodule update --init ; fi
 
 # build and developer images
 set -x
 $docker build $buildx -t ${TAG} "${@}" $load \
-    --build-arg EPICS_TARGET_ARCH=$T_A \
     --build-arg IMAGE_EXT=$IMAGE_EXT \
     $runtime --target $TARGET .

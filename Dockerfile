@@ -1,6 +1,6 @@
 ARG IMAGE_EXT
 
-ARG BASE=7.0.8ec2b7
+ARG BASE=7.0.8ec2
 ARG REGISTRY=ghcr.io/epics-containers
 ARG RUNTIME=${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE}
 ARG DEVELOPER=${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE}
@@ -61,8 +61,7 @@ RUN bash ${IOC}/install_proxy.sh
 FROM developer AS runtime_prep
 
 # get the products from the build stage and reduce to runtime assets only
-# TODO ibek will default to copying ibek* and /venv
-RUN ibek ioc extract-runtime-assets /assets ${SOURCE_FOLDER}/ibek* /venv
+RUN ibek ioc extract-runtime-assets /assets
 
 ##### runtime stage ############################################################
 FROM ${RUNTIME} AS runtime
@@ -73,5 +72,5 @@ COPY --from=runtime_prep /assets /
 # install runtime system dependencies, collected from install.sh scripts
 RUN ibek support apt-install-runtime-packages --skip-non-native
 
-ENTRYPOINT ["bash", "-c", "${IOC}/start.sh"]
+CMD "bash -c ${IOC}/start.sh"
 
