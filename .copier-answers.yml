@@ -1,8 +1,9 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 3.2.0b3
+_commit: 3.4.0
 _src_path: gh:epics-containers/ioc-template
 description: Generic IOC for the Delta Tau turbo pmac and power pmac motion controllers
 git_platform: github.com
 github_org: epics-containers
 name: ioc-pmac
 repo_uri: git@github.com:epics-containers/ioc-pmac.git
+rtems: true

@@ -14,5 +14,5 @@ To update to the latest version of the template:
 
 pip install copier
 cd ioc-pmac
-copier update -A --trust .
+copier update -a --trust .
 ```
