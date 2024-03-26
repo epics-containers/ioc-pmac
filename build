@@ -25,7 +25,7 @@ if ! docker version &>/dev/null; then docker=podman; else docker=docker; fi
 if $docker buildx version &>/dev/null; then builx=buildx; load=--load; fi
 
 # make sure new repos get their submodule ibek-support
-if [ ! -d ibek-support/_globals ] ; then git submodule update --init ; fi
+if [ ! -d ibek-support/_global ] ; then git submodule update --init ; fi
 
 # build and developer images
 set -x
