@@ -1,0 +1,11 @@
+# This docker compose definition stands up a ca-gateway and phoebus instance.
+# This enables interactive testing to the IOC developer container
+#
+# To lauch these services:-
+# source ./environment.sh
+# docker compose up -d
+#
+
+include:
+    - services/gateway/compose.yml
+    - services/phoebus/compose.yml

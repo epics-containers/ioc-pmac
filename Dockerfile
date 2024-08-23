@@ -29,6 +29,9 @@ RUN sequencer/install.sh R2-2-9
 COPY ibek-support/iocStats/ iocStats
 RUN iocStats/install.sh 3.2.0
 
+COPY ibek-support/pvxs/ pvxs/
+RUN pvxs/install.sh 1.3.1
+
 COPY ibek-support/asyn/ asyn/
 RUN asyn/install.sh R4-44-2
 
@@ -72,5 +75,4 @@ COPY --from=runtime_prep /assets /
 # install runtime system dependencies, collected from install.sh scripts
 RUN ibek support apt-install-runtime-packages --skip-non-native
 
-CMD "bash -c ${IOC}/start.sh"
-
+CMD ["bash", "-c", "${IOC}/start.sh"]
