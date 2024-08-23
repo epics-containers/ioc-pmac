@@ -33,7 +33,7 @@ description='
     startup script. The file name should always be 'ioc.yaml'. The ioc instance
     can determine its own name with the following as the first line in 'ioc.yaml'
 
-        ioc_name: ""{{ __utils__.get_env('IOC_NAME') }}""
+        ioc_name: ""{{ _global.get_env('IOC_NAME') }}""
 
     at the top of the file and in turn "{{ ioc_name }}"" can be used in any
     of the fields within the file. For example: by default Kubernetes will be
@@ -120,7 +120,7 @@ if [ -f ${override} ]; then
 # 2. ioc.yaml ******************************************************************
 elif [ -f ${ibek_src} ]; then
 
-    if [[ ${#ibek_yams[@]} > 1 ]]; then
+    if [[ ${#ibek_yamls[@]} > 1 ]]; then
         ibek_error "ERROR: Multiple YAML files found in ${CONFIG_DIR}."
     fi
 

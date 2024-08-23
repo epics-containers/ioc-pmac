@@ -11,8 +11,11 @@ ibek
 # dont save workspaces as other users will have differing folders
 *workspace
 
-# config folder is there to be replaced there is just a dummy with Readme.
+# config folder is a container mount at /epics/ioc/config
 ioc/config
+# the opi folder is also mounted into the container at /epics/ioc/opi
+opi/auto-generated/*
+!opi/auto-generated/.placeholder
 
 # podman may leave this around in aborted builds
 .build.swp

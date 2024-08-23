@@ -3,4 +3,11 @@
 # custom initialization goes here - runs outside of the dev container
 # just before the container is launched but after the container is created
 
+FOLDER=$(dirname $(readlink -f $0))
+
 echo "devcontainerID ${1}"
+
+# make sure the shared network is created
+# TODO this would be better done with compose but compose and podman
+# in devcontainers is not currently stable.
+source $FOLDER/../compose/environment.sh
