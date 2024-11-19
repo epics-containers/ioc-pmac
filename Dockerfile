@@ -51,7 +51,7 @@ COPY ibek-support/motor/ motor/
 RUN motor/install.sh R7-3-1
 
 COPY ibek-support/pmac/ pmac/
-RUN pmac/install.sh 2-6-2b1
+RUN pmac/install.sh 2-6-5
 
 # get the ioc source and build it
 COPY ioc ${SOURCE_FOLDER}/ioc
