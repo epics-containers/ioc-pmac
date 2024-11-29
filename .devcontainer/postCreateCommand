@@ -23,7 +23,7 @@ echo 'source <(ibek --show-completion bash)' >> $HOME/.bashrc
 echo 'source <(ibek --show-completion zsh)' >> $HOME/.zshrc
 
 # pick theme and RPS1 with no unicode chars to avoid completion corruption in zsh
-sed -i $HOME/.zshrc -e 's/ZSH_THEME="devcontainers"/ZSH_THEME="dst"/' -e '/^RPS1=/d'
+sed -i $HOME/.zshrc -e 's/^ZSH_THEME.*$/ZSH_THEME="dst"/' -e '/^RPS1=/d'
 # override the response PS - this shows the last exit code in red only
 # echo "RPS1=$'%(?..%{\C-[[01;31m%}%? %{\C-[[00m%})'" >> $HOME/.zshrc
 

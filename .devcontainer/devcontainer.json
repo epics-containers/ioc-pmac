@@ -15,18 +15,17 @@
     "remoteEnv": {
         // provides a name for epics-containers to use in bash prompt etc.
         "EC_PROJECT": "${localWorkspaceFolderBasename}",
-        "EPICS_CA_AUTO_ADDR_LIST": "NO",
-        "EPICS_CA_ADDR_LIST": "127.0.0.1"
+        "IOC_NAME": "DEV_TEST_IOC"
     },
     "features": {
-        // add quality of life features for developers including git config integration
-        "ghcr.io/devcontainers/features/common-utils:2": {
-            // don't upgrade to make this similar to the runtime container
-            "upgradePackages": false
-        }
+        // add in eternal history and other bash features
+        "ghcr.io/diamondlightsource/devcontainer-features/bash-config:1.0.0": {}
     },
-    // IMPORTANT for this devcontainer to work with docker EC_REMOTE_USER must be
-    // set to your user name. You will run with full sudo rights.
+    // outside of the container setup
+    "initializeCommand": "bash .devcontainer/initializeCommand ${devcontainerId}",
+    // IMPORTANT for this devcontainer to work with docker rootful
+    // EC_REMOTE_USER must be set to your user name. You will run with full
+    // sudo rights.
     // For podman it should be left blank. You will run as root but host mounts
     // will be owned by your user id.
     "remoteUser": "${localEnv:EC_REMOTE_USER}",
@@ -35,24 +34,27 @@
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
                 "ms-python.vscode-pylance",
-                "tamasfe.even-better-toml",
                 "redhat.vscode-yaml",
-                "ryanluker.vscode-coverage-gutters",
                 "epicsdeb.vscode-epics",
                 "charliermarsh.ruff"
             ]
         }
     },
-    // You can place any outside of the container before-launch commands here
-    "initializeCommand": "bash .devcontainer/initializeCommand ${devcontainerId}",
     // One time global setup commands inside the container
     "postCreateCommand": "bash .devcontainer/postCreateCommand ${devcontainerId}",
     "runArgs": [
-        // IMPORTANT: this network must exist before the container is created
-        // source compose/environment.sh to create it before first use
-        "--network=channel_access_devcontainer",
         // Make sure SELinux does not disable write access to host filesystems like tmp
         "--security-opt=label=disable"
+    ],
+    "appPort": [
+        // Expose Channel Access on the hosts loopback interface
+        // NOTE: change the first port number to run more than one devcontainer
+        // on the same host.
+        //
+        // To access two devcontainers from the host for example:
+        // EPICS_CA_ADDR_LIST="127.0.0.1:5064 127.0.0.1:6064"
+        "127.0.0.1:5064:5064/udp",
+        "127.0.0.1:5064-5065:5064-5065"
     ],
     // Mount the parent of the project folder so we can access peer projects
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
