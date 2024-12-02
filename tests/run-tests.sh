@@ -13,9 +13,10 @@ CONF=/epics/ioc/config
 # log commands and stop on errorsr
 set -ex
 
-if podman version &> /dev/null && [[ -z $USE_DOCKER ]]
-    then docker=podman
-    else docker=docker
+# prefer docker but use podman if USE_PODMAN is set
+if docker version &> /dev/null && [[ -z $USE_PODMAN ]]
+    then docker=docker
+    else docker=podman
 fi
 
 cd ${ROOT}
@@ -38,6 +39,4 @@ elif [[ ! ${result} =~ "5.15" || ! ${result} =~ "/epics/runtime/st.cmd" ]]; then
 fi
 
 echo "Tests passed!"
-
-
 

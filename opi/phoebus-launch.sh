@@ -5,9 +5,17 @@
 thisdir=$(realpath $(dirname $0))
 workspace=$(realpath ${thisdir}/..)
 
+# update settings.ini with CA and PVA ports
+source ${workspace}/.devcontainer/.env
+cat ${workspace}/opi/settings.ini |
+    sed -r \
+    -e "s|5064|${EPICS_CA_SERVER_PORT}|" \
+    -e "s|5075|${EPICS_PVA_SERVER_PORT}|" \
+    -e "s|5065|${EPICS_CA_REPEATER_PORT}|" > /tmp/settings.ini
+
 settings="
 -resource ${workspace}/opi/auto-generated/index.bob
--settings ${workspace}/opi/settings.ini
+-settings /tmp/settings.ini
 "
 
 if which phoebus.sh &>/dev/null ; then
@@ -23,9 +31,10 @@ elif module load phoebus 2>/dev/null; then
 else
     echo "No local phoebus install found, using a container"
 
-    if podman version &> /dev/null && [[ -z $USE_DOCKER ]] ;
-        then docker=podman
-        else docker=docker
+    # prefer docker but use podman if USE_PODMAN is set
+    if docker version &> /dev/null && [[ -z $USE_PODMAN ]]
+        then docker=docker; UIDGID=$(id -u):$(id -g)
+        else docker=podman; UIDGID=0:0
     fi
     echo "Using $docker as container runtime"
 
@@ -34,13 +43,13 @@ else
 
     # settings for container launch
     x11="-e DISPLAY --net host"
-    args=$"--rm -it --security-opt=label=none"
-    mounts="-v=/tmp:/tmp -v=${workspace}:/workspace"
+    args="--rm -it --security-opt=label=none --user ${UIDGID}"
+    mounts="-v=/tmp:/tmp -v=${workspace}:/workspace -v=${workspace}/..:/workspaces"
     image="ghcr.io/epics-containers/ec-phoebus:latest"
 
     settings="
-    -settings /workspace/opi/settings.ini
     -resource /workspace/opi/auto-generated/index.bob
+    -settings /tmp/settings.ini
     "
 
     set -x
