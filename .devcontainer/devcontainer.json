@@ -48,17 +48,18 @@
     ],
     "appPort": [
         // Expose Channel Access ports on the host's loopback interface
-        // Note: update the environment variables in .devcontainer/.env to
-        // change the ports when running multiple devcontainers simultaneously,
-        // then use e.g. EPICS_CA_ADDR_LIST="127.0.0.1:5064 127.0.0.1:6064"
+        // Note: set all three environment variables below to unique values
+        // in order to a second devcontainer on the same host.
+        //
+        // Then use e.g. EPICS_CA_ADDR_LIST="127.0.0.1:5064 127.0.0.1:6064"
         // for clients to connect to multiple devcontainers' PVs.
         //
-        "127.0.0.1:${remoteEnv:EPICS_CA_SERVER_PORT}:${remoteEnv:EPICS_CA_SERVER_PORT}/udp",
-        "127.0.0.1:${remoteEnv:EPICS_CA_SERVER_PORT}:${remoteEnv:EPICS_CA_SERVER_PORT}",
-        "127.0.0.1:${remoteEnv:EPICS_CA_REPEATER_PORT}:${remoteEnv:EPICS_CA_REPEATER_PORT}",
+        "127.0.0.1:${localEnv:EPICS_CA_SERVER_PORT:5064}:${localEnv:EPICS_CA_SERVER_PORT:5064}/udp",
+        "127.0.0.1:${localEnv:EPICS_CA_SERVER_PORT:5064}:${localEnv:EPICS_CA_SERVER_PORT:5064}",
+        "127.0.0.1:${localEnv:EPICS_CA_REPEATER_PORT:5065}:${localEnv:EPICS_CA_REPEATER_PORT:5065}",
         //
         // Expose the PVA name server port on all host interfaces
-        "${remoteEnv:EPICS_PVA_SERVER_PORT}:${remoteEnv:EPICS_PVA_SERVER_PORT}"
+        "${localEnv:EPICS_PVA_SERVER_PORT:5075}:${localEnv:EPICS_PVA_SERVER_PORT:5075}"
     ],
     // Mount the parent of the project folder so we can access peer projects
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
