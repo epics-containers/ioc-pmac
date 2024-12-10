@@ -20,16 +20,21 @@ fi
 
 cd $(dirname ${0})
 
-# use docker if available else use podman
-if ! docker version &>/dev/null; then docker=podman; else docker=docker; fi
-if $docker buildx version &>/dev/null; then buildx=buildx; load=--load ; fi
-if [[ $DOCKER_BUILDKIT == "0" ]]; then buildx=; load=; fi
+# make sure the ioc binaries and config symlink are cleaned up
+git clean -fdx ioc
+
+# prefer docker but use podman if USE_PODMAN is set
+if docker version &> /dev/null && [[ -z $USE_PODMAN ]]
+    then docker=docker
+    else docker=podman
+fi
 
 # make sure new repos get their submodule ibek-support
 if [ ! -d ibek-support/_global ] ; then git submodule update --init ; fi
 
-# build and developer images
+# build runtime or developer image
 set -x
-$docker $buildx build -t ${TAG} "${@}" $load \
-    --build-arg IMAGE_EXT=$IMAGE_EXT \
-    $runtime --target $TARGET .
+$docker build -t ${TAG} "${@}" --build-arg IMAGE_EXT=$IMAGE_EXT \
+    --build-arg BUILDKIT_INLINE_CACHE=1 \
+    --build-arg EPICS_TARGET_ARCH=$T_A \
+    --load --target $TARGET .

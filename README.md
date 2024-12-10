@@ -1,4 +1,4 @@
-# Generic IOC Template Repository ioc-pmac
+# Generic IOC ioc-pmac
 
 ## Description
 Generic IOC for the Delta Tau turbo pmac and power pmac motion controllers
@@ -21,14 +21,11 @@ copier update -a --trust .
 
 This repository includes a developer container configuration for Visual Studio Code. This allows you to run the Generic IOC locally and debug it. See https://epics-containers.github.io/main/tutorials/dev_container.html.
 
-### IMPORTANT: First Time Preparation
+## Channel Access
 
-The devcontainer uses a docker network that it can share with a ca-gateway in order that your PVs are accessible from your host machine. We arrange to create this network once and as long as you don't delete it or reset docker it will be available for all your devcontainers going forward.
-
-To create the network run the following commands:
+The vscode developer container auto forwards the channel access ports on the loopback interface. If you have channel access clients running on the host machine, you can connect to the IOC by setting the `EPICS_CA_NAME_SERVERS` environment variable as follows:
 
 ```bash
-cd ioc-adsimdetector
-source ./compose/environment.sh
+export EPICS_CA_NAME_SERVERS=127.0.0.1:5064
+caget IOCNAME:PVNAME
 ```
-

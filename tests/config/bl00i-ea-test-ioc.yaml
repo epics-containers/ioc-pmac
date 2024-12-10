@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://github.com/epics-containers/ioc-template/releases/download/2024.1.1/ibek.ioc.schema.json
+# yaml-language-server: $schema=https://github.com/epics-containers/ioc-template-example/releases/download/4.1.0/ibek.ioc.schema.json
 
 ioc_name: "{{ ioc_yaml_file_name }}"
 
@@ -26,4 +26,3 @@ entities:
   - type: epics.PostStartupCommand
     command: |
       dbgf EXAMPLE:IBEK:SUM
-      dbgf BL00I-EA-TEST-IOC:ST_SCRIPT1
