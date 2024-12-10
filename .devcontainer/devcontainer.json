@@ -46,21 +46,6 @@
         // Make sure SELinux does not disable write access to host filesystems like tmp
         "--security-opt=label=disable"
     ],
-    "appPort": [
-        // Expose Channel Access ports on the host's loopback interface
-        // Note: set all three environment variables below to unique values
-        // in order to a second devcontainer on the same host.
-        //
-        // Then use e.g. EPICS_CA_ADDR_LIST="127.0.0.1:5064 127.0.0.1:6064"
-        // for clients to connect to multiple devcontainers' PVs.
-        //
-        "127.0.0.1:${localEnv:EPICS_CA_SERVER_PORT:5064}:${localEnv:EPICS_CA_SERVER_PORT:5064}/udp",
-        "127.0.0.1:${localEnv:EPICS_CA_SERVER_PORT:5064}:${localEnv:EPICS_CA_SERVER_PORT:5064}",
-        "127.0.0.1:${localEnv:EPICS_CA_REPEATER_PORT:5065}:${localEnv:EPICS_CA_REPEATER_PORT:5065}",
-        //
-        // Expose the PVA name server port on all host interfaces
-        "${localEnv:EPICS_PVA_SERVER_PORT:5075}:${localEnv:EPICS_PVA_SERVER_PORT:5075}"
-    ],
     // Mount the parent of the project folder so we can access peer projects
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
     // mount in other useful files from the host

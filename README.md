@@ -23,9 +23,9 @@ This repository includes a developer container configuration for Visual Studio C
 
 ## Channel Access
 
-The developer container exposes channel access ports on the loopback interface. If you have channel access clients running on the host machine, you can connect to the IOC by setting the `EPICS_CA_ADDR_LIST` environment variable as follows:
+The vscode developer container auto forwards the channel access ports on the loopback interface. If you have channel access clients running on the host machine, you can connect to the IOC by setting the `EPICS_CA_NAME_SERVERS` environment variable as follows:
 
 ```bash
-export EPICS_CA_ADDR_LIST=127.0.0.1
+export EPICS_CA_NAME_SERVERS=127.0.0.1:5064
 caget IOCNAME:PVNAME
 ```

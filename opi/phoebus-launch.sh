@@ -6,12 +6,11 @@ thisdir=$(realpath $(dirname $0))
 workspace=$(realpath ${thisdir}/..)
 
 # update settings.ini with CA and PVA ports
-source ${workspace}/.devcontainer/.env
 cat ${workspace}/opi/settings.ini |
     sed -r \
-    -e "s|5064|${EPICS_CA_SERVER_PORT}|" \
-    -e "s|5075|${EPICS_PVA_SERVER_PORT}|" \
-    -e "s|5065|${EPICS_CA_REPEATER_PORT}|" > /tmp/settings.ini
+    -e "s|5064|${EPICS_CA_SERVER_PORT:-5064}|" \
+    -e "s|5075|${EPICS_PVA_SERVER_PORT:-5075}|" \
+    -e "s|5065|${EPICS_CA_REPEATER_PORT:-5065}|" > /tmp/settings.ini
 
 settings="
 -resource ${workspace}/opi/auto-generated/index.bob
@@ -31,10 +30,10 @@ elif module load phoebus 2>/dev/null; then
 else
     echo "No local phoebus install found, using a container"
 
-    # prefer docker but use podman if USE_PODMAN is set
-    if docker version &> /dev/null && [[ -z $USE_PODMAN ]]
-        then docker=docker; UIDGID=$(id -u):$(id -g)
-        else docker=podman; UIDGID=0:0
+    # prefer podman but use docker if USE_DOCKER is set
+    if podman version &> /dev/null && [[ -z $USE_DOCKER ]]
+        then docker=podman; UIDGID=0:0
+        else docker=docker; UIDGID=$(id -u):$(id -g)
     fi
     echo "Using $docker as container runtime"
 

@@ -39,4 +39,3 @@ elif [[ ! ${result} =~ "5.15" || ! ${result} =~ "/epics/runtime/st.cmd" ]]; then
 fi
 
 echo "Tests passed!"
-
