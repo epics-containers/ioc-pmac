@@ -15,6 +15,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(gdb) Attach to IOC",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "/epics/ioc/bin/linux-x86_64/ioc",
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "IOC devcontainer debug",
             "type": "cppdbg",
             "request": "launch",

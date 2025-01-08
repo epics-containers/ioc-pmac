@@ -1,6 +1,6 @@
 ARG IMAGE_EXT
 
-ARG BASE=7.0.8ec2
+ARG BASE=7.0.8ec3b1
 ARG REGISTRY=ghcr.io/epics-containers
 ARG RUNTIME=${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE}
 ARG DEVELOPER=${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE}
@@ -28,9 +28,6 @@ RUN sequencer/install.sh R2-2-9
 
 COPY ibek-support/iocStats/ iocStats
 RUN iocStats/install.sh 3.2.0
-
-COPY ibek-support/pvxs/ pvxs/
-RUN pvxs/install.sh 1.3.1
 
 COPY ibek-support/asyn/ asyn/
 RUN asyn/install.sh R4-44-2
