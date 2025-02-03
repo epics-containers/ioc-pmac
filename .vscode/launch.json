@@ -34,7 +34,11 @@
             ]
         },
         {
+<<<<<<< before updating
             "name": "IOC devcontainer debug",
+=======
+            "name": "Launch IOC in debugger",
+>>>>>>> after updating
             "type": "cppdbg",
             "request": "launch",
             "program": "/epics/ioc/bin/linux-x86_64/ioc",

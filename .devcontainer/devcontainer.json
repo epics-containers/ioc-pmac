@@ -36,7 +36,8 @@
                 "ms-python.vscode-pylance",
                 "redhat.vscode-yaml",
                 "epicsdeb.vscode-epics",
-                "charliermarsh.ruff"
+                "charliermarsh.ruff",
+                "ms-vscode.cpptools"
             ]
         }
     },
