@@ -14,12 +14,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        epics-target: [RTEMS-beatnik,linux-x86_64] # , linux-aarch64]
+        epics-target: [RTEMS-beatnik, linux-x86_64] # , linux-aarch64]
         include:
           - os: ubuntu-latest # everyone is on ubuntu-latest
-          - epics-target: RTEMS-beatnik
-            extension: -rtems-beatnik
-            platform: linux/amd64
+
+          # UNFORTUNATELY - the rtems WAF is not compatible with python 3.12 as it
+          # uses versioneer - so this does not build against ubuntu 24.04
+          # - epics-target: RTEMS-beatnik
+          #   extension: -rtems-beatnik
+          #   platform: linux/amd64
+
           - epics-target: linux-x86_64
             extension: ""
             platform: linux/amd64
