@@ -1,6 +1,6 @@
 ARG IMAGE_EXT
 
-ARG BASE=7.0.9ec1
+ARG BASE=7.0.9ec2
 ARG REGISTRY=ghcr.io/epics-containers
 ARG RUNTIME=${REGISTRY}/epics-base${IMAGE_EXT}-runtime:${BASE}
 ARG DEVELOPER=${REGISTRY}/epics-base${IMAGE_EXT}-developer:${BASE}
@@ -34,6 +34,9 @@ RUN asyn/install.sh R4-44-2
 
 COPY ibek-support/autosave/ autosave/
 RUN autosave/install.sh R5-11
+
+COPY ibek-support/pvlogging/ pvlogging/
+RUN pvlogging/install.sh 1-5-2
 
 COPY ibek-support/busy/ busy/
 RUN busy/install.sh R1-7-4

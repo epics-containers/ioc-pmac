@@ -170,7 +170,7 @@ else
     else
         # the RTEMS container provides a python package to:
         # - copy binaries to the IOC's shared folder
-        # - remotely configure the boot parameters
+        # - remotely configure the boot parameters (TODO)
         # - remotely launch the IOC
         rtems-proxy start
     fi
