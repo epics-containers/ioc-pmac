@@ -34,8 +34,9 @@ jobs:
           #     platform: linux/arm64
 
     runs-on: ${{ matrix.os }}
-    env:
-      TAG: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}${{ matrix.extension }}
+    outputs:
+      developer-tag: ${{ steps.meta-developer.outputs.tags }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,6 +74,15 @@ jobs:
         if: ${{ matrix.epics-target == 'linux-x86_64' }}
         run: tests/run-tests.sh ci_test
 
+      - name: Developer target metadata
+        id: meta-developer
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}${{ matrix.extension }}-developer
+          tags: |
+            type=raw,value=${{ github.ref_name }}
+
       - name: Push developer image
         if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
         uses: docker/build-push-action@v5
@@ -82,8 +92,18 @@ jobs:
           target: developer
           build-args: |
             IMAGE_EXT=${{ matrix.extension }}
-          tags: ${{ env.TAG }}-developer:${{ github.ref_name }}
+          tags: ${{ steps.meta-developer.outputs.tags }}
+          labels: ${{ steps.meta-developer.outputs.labels }}
           push: true
+
+      - name: Runtime target metadata
+        id: meta-runtime
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}${{ matrix.extension }}-runtime
+          tags: |
+            type=raw,value=${{ github.ref_name }}
 
       - name: Push runtime image
         if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
@@ -94,7 +114,8 @@ jobs:
           target: runtime
           build-args: |
             IMAGE_EXT=${{ matrix.extension }}
-          tags: ${{ env.TAG }}-runtime:${{ github.ref_name }}
+          tags: ${{ steps.meta-runtime.outputs.tags }}
+          labels: ${{ steps.meta-runtime.outputs.labels }}
           push: true
 
   release:
@@ -105,9 +126,13 @@ jobs:
 
     # this job runs in the native developer container we just made
     container:
-      image: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-developer:${{ github.ref_name }}
+      image: ${{ needs.build.outputs.developer-tag }}
 
     steps:
+      - name: report container tag name
+        run: |
+          echo developer container image tag is ${{ needs.build.outputs.developer-tag }}
+
       - name: generate-schema
         run: |
           ibek ioc generate-schema --output ibek.ioc.schema.json
