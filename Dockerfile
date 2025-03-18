@@ -58,7 +58,7 @@ RUN ansible.sh ioc
 RUN bash ${IOC}/install_proxy.sh
 
 # TODO this is to make autosave work for non-root users at runtime.
-# but in general having /epics writable is useful - think on how to do this better
+# but in general having /epics writable is useful. Maybe. Think on this.
 RUN chmod a+w /epics/ -R
 
 ##### runtime preparation stage ################################################
@@ -75,7 +75,7 @@ FROM ${RUNTIME} AS runtime
 COPY --from=runtime_prep /assets /
 
 # TODO this is to make autosave work for non-root users at runtime.
-# but in general having /epics writable is useful - think on how to do this better
+# but in general having /epics writable is useful. Maybe. Think on this.
 RUN chmod a+w /epics/ -R
 
 # install runtime system dependencies, collected from install.sh scripts
