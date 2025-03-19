@@ -61,8 +61,7 @@ RUN bash ${IOC}/install_proxy.sh
 FROM developer AS runtime_prep
 
 # get the products from the build stage and reduce to runtime assets only
-# TODO /epics/autosave should be a built in for extract-runtime-assets
-RUN ibek ioc extract-runtime-assets /assets /epics/autosave
+RUN ibek ioc extract-runtime-assets /assets
 
 ##### runtime stage ############################################################
 FROM ${RUNTIME} AS runtime

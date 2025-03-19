@@ -130,6 +130,7 @@ elif [ -f ${ibek_src} ]; then
 
     # get the ibek support yaml files this ioc's support modules
     defs=/epics/ibek-defs/*.ibek.support.yaml
+    # prepare the runtime assets: ioc.db, st.cmd + protocol, autosave files
     ibek runtime generate ${ibek_src} ${defs}
     ibek runtime generate-autosave
     if [[ -d /epics/support/configure/protocol ]] ; then
