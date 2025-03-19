@@ -57,10 +57,6 @@ RUN ansible.sh ioc
 # install runtime proxy for non-native builds
 RUN bash ${IOC}/install_proxy.sh
 
-# TODO this is to make autosave work for non-root users at runtime.
-# but in general having /epics writable is useful. Maybe. Think on this.
-RUN chmod a+w /epics/ -R
-
 ##### runtime preparation stage ################################################
 FROM developer AS runtime_prep
 
@@ -73,10 +69,6 @@ FROM ${RUNTIME} AS runtime
 
 # get runtime assets from the preparation stage
 COPY --from=runtime_prep /assets /
-
-# TODO this is to make autosave work for non-root users at runtime.
-# but in general having /epics writable is useful. Maybe. Think on this.
-RUN chmod a+w /epics/ -R
 
 # install runtime system dependencies, collected from install.sh scripts
 RUN ibek support apt-install-runtime-packages --skip-non-native
