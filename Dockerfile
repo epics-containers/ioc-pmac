@@ -50,6 +50,9 @@ RUN ansible.sh motor
 COPY ibek-support/pmac/ pmac/
 RUN ansible.sh pmac
 
+COPY ibek-support/positioner/ positioner/
+RUN ansible.sh positioner
+
 # get the ioc source and build it
 COPY ioc ${SOURCE_FOLDER}/ioc
 RUN ansible.sh ioc
