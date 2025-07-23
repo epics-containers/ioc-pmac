@@ -67,6 +67,17 @@ description='
 
 '
 
+# log commands and stop on errors
+set -xe
+
+# wrap this script in stdio-expose if running in Kubernetes
+# this allows the IOC to expose its console on a Unix socket
+if [[ -n ${KUBERNETES_PORT} && -z ${STDIO_EXPOSED} ]]; then
+    STDIO_EXPOSED=YES stdio-expose ${IOC}/start.sh
+    exit 0
+fi
+
+
 # error reporting *************************************************************
 
 function ibek_error {
@@ -78,8 +89,6 @@ function ibek_error {
 
 # environment setup ************************************************************
 
-# log commands and stop on errors
-set -xe
 
 cd ${IOC}
 CONFIG_DIR=${IOC}/config
