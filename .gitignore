@@ -23,4 +23,5 @@ opi/auto-generated
 # TODO this entry does not work - why on earth not?
 ioc/configure/CONFIG_SITE.Common.linux-x86_64
 
+**/.ansible
 **/*build.log

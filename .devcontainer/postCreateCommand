@@ -8,27 +8,8 @@
 # the following steps are then required
 ################################################################################
 
-if [[ $USER != "root" ]] ; then
+if [[ $(id -u) != "0" ]] ; then
     # make sure the non-root user can build iocs and (mounted in) support modules
     sudo chown -R ${USER}:${USER} /epics/ibek-defs /epics/pvi-defs /epics/support/configure /venv
     sudo chown -h ${USER}:${USER} /epics /epics/ioc /epics/support
-fi
-
-################################################################################
-# Shell customizations for Generic IOC devcontainers
-################################################################################
-
-# add ibek completion to bash and zsh
-echo 'source <(ibek --show-completion bash)' >> $HOME/.bashrc
-echo 'source <(ibek --show-completion zsh)' >> $HOME/.zshrc
-
-# pick theme and RPS1 with no unicode chars to avoid completion corruption in zsh
-sed -i $HOME/.zshrc -e 's/^ZSH_THEME.*$/ZSH_THEME="dst"/' -e '/^RPS1=/d'
-# override the response PS - this shows the last exit code in red only
-# echo "RPS1=$'%(?..%{\C-[[01;31m%}%? %{\C-[[00m%})'" >> $HOME/.zshrc
-
-# allow personalization of all devcontainers in this subdirectory
-# by placing a .devcontainer_rc file in the workspace root
-if [[ -f /workspaces/.devcontainer_rc ]] ; then
-    source /workspaces/.devcontainer_rc
 fi
