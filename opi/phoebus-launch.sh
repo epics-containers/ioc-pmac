@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Comment out this variable if you want to use your local phoebus
+use_container=1
+
 # A launcher for the phoebus to view the generated OPIs
 
 thisdir=$(realpath $(dirname $0))
@@ -15,6 +18,7 @@ cat ${workspace}/opi/settings.ini |
 settings="
 -resource ${workspace}/opi/auto-generated/index.bob
 -settings /tmp/settings.ini
+-server 2200
 "
 
 if which phoebus.sh &>/dev/null && [[ -z ${use_container} ]] ; then
@@ -47,6 +51,7 @@ else
     settings="
     -resource /workspace/opi/auto-generated/index.bob
     -settings /tmp/settings.ini
+    -server 2200
     "
 
     set -x

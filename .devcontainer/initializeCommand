@@ -7,10 +7,7 @@ echo "initializeCommand for devcontainerID ${1}"
 set -xe
 
 # make the config folder for the shared bash-config feature
-mkdir -p ${HOME}/.config/bash-config
+mkdir -p ${HOME}/.config/terminal-config ${HOME}/.cache/uv
 # make a folder for auto-generated opi screens
 mkdir -p ./opi/auto-generated
-
-# ensure local container users can access X11 server
-xhost +SI:localuser:$(id -un)
 
