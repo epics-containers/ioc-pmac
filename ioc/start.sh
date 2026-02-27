@@ -69,6 +69,9 @@ if [ -f ${RUNTIME_DIR}/ioc.subst ]; then
     bash -c "msi -o${RUNTIME_DIR}/ioc.db ${includes} -I${RUNTIME_DIR} -S${RUNTIME_DIR}/ioc.subst"
 fi
 
+# Check hardware communication pre-requisites **********************************
+ibek ioc do-wait
+
 # Launch the IOC ***************************************************************
 
 ${IOC}/bin/linux-x86_64/ioc ${RUNTIME_DIR}/st.cmd

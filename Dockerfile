@@ -7,9 +7,11 @@ ARG DEVELOPER=${REGISTRY}/ioc-asyn${IMAGE_EXT}-developer:4.45ec2
 ##### build stage ##############################################################
 FROM  ${DEVELOPER} AS developer
 
+RUN apt update -y
+
 # Get the current version of ibek
-# COPY requirements.txt requirements.txt
-# RUN uv pip install --upgrade -r requirements.txt
+COPY requirements.txt requirements.txt
+RUN uv pip install --upgrade -r requirements.txt
 
 WORKDIR ${SOURCE_FOLDER}/ibek-support
 
