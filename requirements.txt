@@ -1,4 +1,4 @@
-ibek==3.3.4b3
+ibek==3.3.4b5
 # to install direct from github during development in a branch
 # git+https://github.com/epics-containers/ibek.git@fix-extract-assets
 stdio-socket>=1.4.0
