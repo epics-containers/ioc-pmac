@@ -23,7 +23,6 @@ fi
 
 # check that the ibek doWait command has completed successfully
 if [ -f ${TMP_DIR}/doWait_completed.txt ]; then
-    echo "k8s startup check for ${IOC_NAME}: ibek doWait command completion validated" > /proc/1/fd/1
     exit 0
 else
     exit 1

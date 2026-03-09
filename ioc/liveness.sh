@@ -20,9 +20,11 @@ fi
 # use devIOCStats UPTIME as the default liveness PV
 # but allow override from the environment
 K8S_IOC_PV=${K8S_IOC_PV:-"${IOC_PREFIX}:UPTIME"}
+echo "Performing liveness check for PV: ${K8S_IOC_PV}" > /proc/1/fd/1
 
 # use default CA PORT or override from the environment
 K8S_IOC_PORT=${K8S_IOC_PORT:-5064}
+echo "Using CA Server Port: ${K8S_IOC_PORT}" > /proc/1/fd/1
 
 export EPICS_CA_ADDR_LIST=${K8S_IOC_ADDRESS}
 export EPICS_CA_SERVER_PORT=${K8S_IOC_PORT}
