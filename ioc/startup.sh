@@ -15,9 +15,11 @@ if [[ -f ${override} && ${override} != ${THIS_SCRIPT} ]]; then
     exec bash ${override}
 fi
 
-# check that the ibek doWait command has completed successfully
-if [ -f ${TMP_DIR}/doWait_completed.txt ]; then
-    exit 0
-else
-    exit 1
-fi
+# Wait for the ibek doWait command to have completed successfully.
+# Such loop prevents the pod to report failed k8s startup probe events unecessarily
+# (i.e. by exiting and trying again) while the IOC is still in the process of starting up.
+while [ ! -f ${TMP_DIR}/doWait_completed.txt ]; do
+    sleep 1
+done
+
+exit 0
