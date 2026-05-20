@@ -49,12 +49,6 @@ for f in ioc.db ioc.subst st.cmd; do
     fi
 done
 
-# copy any streamDevice protocol files to runtime folder ***********************
-
-if [[ -d /epics/support/configure/protocol ]] ; then
-    rm -fr ${RUNTIME_DIR}/protocol
-    cp -r /epics/support/configure/protocol  ${RUNTIME_DIR}
-fi
 
 # generate EPICS runtime assets ************************************************
 
@@ -69,8 +63,20 @@ if [ -f ${RUNTIME_DIR}/ioc.subst ]; then
     bash -c "msi -o${RUNTIME_DIR}/ioc.db ${includes} -I${RUNTIME_DIR} -S${RUNTIME_DIR}/ioc.subst"
 fi
 
+# copy any streamDevice protocol files to runtime folder ***********************
+# (must run AFTER `ibek runtime generate2`, which rmtrees ${RUNTIME_DIR})
+if [[ -d /epics/support/configure/protocol ]] ; then
+    rm -fr ${RUNTIME_DIR}/protocol
+    cp -r /epics/support/configure/protocol  ${RUNTIME_DIR}
+fi
+
 # check hardware communication pre-requisites **********************************
-ibek ioc do-wait
+# set IBEK_DO_WAIT_DISABLE=true to skip this step (e.g. to force IOC startup
+# without waiting for hardware, or to bypass it at the shell level in pipelines
+# where ibek is unavailable)
+if [[ -f ${CONFIG_DIR}/ioc.yaml && "${IBEK_DO_WAIT_DISABLE}" != "true" ]]; then
+    ibek ioc do-wait
+fi
 
 # Launch the IOC ***************************************************************
 
