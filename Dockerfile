@@ -18,6 +18,9 @@ WORKDIR ${SOURCE_FOLDER}/ibek-support
 COPY ibek-support/_ansible _ansible
 ENV PATH=$PATH:${SOURCE_FOLDER}/ibek-support/_ansible
 
+COPY ibek-support/autosave/ autosave/
+RUN ansible.sh autosave
+
 COPY ibek-support/motor/ motor/
 RUN ansible.sh motor
 
