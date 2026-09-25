@@ -14,16 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        epics-target: [linux-x86_64] # , linux-aarch64,RTEMS-beatnik, ]
+        epics-target: [linux-x86_64] # , linux-aarch64]
         include:
           - os: ubuntu-latest # everyone is on ubuntu-latest
-
-          # UNFORTUNATELY - the rtems WAF is not compatible with python 3.12 as it
-          # uses versioneer - so this does not build against ubuntu 24.04
-          # - epics-target: RTEMS-beatnik
-          #   extension: -rtems-beatnik
-          #   platform: linux/amd64
-
           - epics-target: linux-x86_64
             extension: ""
             platform: linux/amd64
@@ -64,6 +57,7 @@ jobs:
           target: runtime
           build-args: |
             IMAGE_EXT=${{ matrix.extension }}
+            IOC_VERSION=${{ github.ref_name }}
           cache-from: type=gha,scope=${{ matrix.epics-target }}
           cache-to: type=gha,mode=max,scope=${{ matrix.epics-target }}
           tags: ci_test
@@ -73,6 +67,52 @@ jobs:
         # can't test non native without some hardware to run on
         if: ${{ matrix.epics-target == 'linux-x86_64' }}
         run: tests/run-tests.sh ci_test
+
+      - name: Require released ibek-support on release tags
+        # A released image pins ibek-support by commit hash only, so that commit
+        # must be reachable from the ibek-support default branch or the image
+        # cannot be rebuilt from its source later. Pre-release tags are exempt,
+        # so work in progress can still be published.
+        # see https://github.com/epics-containers/ibek-support/issues/17
+        if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          # PEP440 (2025.12.1b1) and semver (2025.12.1-beta.1) pre-release styles
+          # are both in use across generic IOCs, so accept either.
+          case "${TAG}" in
+              *a[0-9]*|*b[0-9]*|*rc[0-9]*|*alpha*|*beta*|*rc.[0-9]*)
+                  echo "::notice::pre-release tag ${TAG}, skipping ibek-support branch check"
+                  exit 0
+                  ;;
+          esac
+          modules=$(git config --file .gitmodules --get-regexp '^submodule\..*\.path$' || true)
+          status=0
+          for sub in $(echo "${modules}" | cut -s -d' ' -f2); do
+              case "${sub}" in ibek-support*) ;; *) continue ;; esac
+              # the submodule is checked out detached, so find its default
+              # branch and fetch it before asking about ancestry
+              branch=$(git -C "${sub}" ls-remote --symref origin HEAD |
+                  sed -n 's|^ref:[[:space:]]*refs/heads/\([^[:space:]]*\).*|\1|p')
+              branch=${branch:-main}
+              # actions/checkout clones submodules shallow, so the ancestry
+              # walk needs the full history of that branch
+              if [ "$(git -C "${sub}" rev-parse --is-shallow-repository)" = true ]; then
+                  git -C "${sub}" fetch --no-tags --unshallow origin "${branch}"
+              else
+                  git -C "${sub}" fetch --no-tags origin "${branch}"
+              fi
+              sha=$(git -C "${sub}" rev-parse --short HEAD)
+              if git -C "${sub}" merge-base --is-ancestor HEAD FETCH_HEAD; then
+                  echo "${sub} ${sha} is on ${branch}"
+              else
+                  echo "::error::${sub} ${sha} is not on ${branch}. Merge it to"\
+                      "${branch}, update the submodule and re-tag, or publish"\
+                      "this as a pre-release tag (e.g. ${TAG}-beta.1)."
+                  status=1
+              fi
+          done
+          exit ${status}
 
       - name: Developer target metadata
         id: meta-developer
@@ -92,6 +132,7 @@ jobs:
           target: developer
           build-args: |
             IMAGE_EXT=${{ matrix.extension }}
+            IOC_VERSION=${{ github.ref_name }}
           tags: ${{ steps.meta-developer.outputs.tags }}
           labels: ${{ steps.meta-developer.outputs.labels }}
           push: true
@@ -114,6 +155,7 @@ jobs:
           target: runtime
           build-args: |
             IMAGE_EXT=${{ matrix.extension }}
+            IOC_VERSION=${{ github.ref_name }}
           tags: ${{ steps.meta-runtime.outputs.tags }}
           labels: ${{ steps.meta-runtime.outputs.labels }}
           push: true
@@ -123,6 +165,9 @@ jobs:
     needs: [build]
     if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
 
     # this job runs in the native developer container we just made
     container:
@@ -137,9 +182,14 @@ jobs:
         run: |
           ibek ioc generate-schema --output ibek.ioc.schema.json
 
+      - name: copy versions manifest
+        run: |
+          cp /epics/versions.json versions.json
+
       - name: Github Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
         with:
           files: |
             ibek.ioc.schema.json
+            versions.json
           generate_release_notes: true
