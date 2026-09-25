@@ -9,7 +9,7 @@ CONFIG_DIR=/epics/ioc/config
 THIS_SCRIPT=$(realpath ${0})
 override=${CONFIG_DIR}/liveness.sh
 
-if [[ -f ${override} && ${override} != ${THIS_SCRIPT} ]]; then
+if [[ -f ${override} && $(realpath "${override}") != "${THIS_SCRIPT}" ]]; then
     exec bash ${override}
 fi
 

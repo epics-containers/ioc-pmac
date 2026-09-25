@@ -1,4 +1,13 @@
-ibek>=3.3.4
+# Upper bounds limit automatic upgrades in generic IOC image builds: the Dockerfile
+# runs 'uv pip install --upgrade', so without a ceiling a rebuild can select the
+# latest ibek / pvi release on PyPI. Bump these deliberately.
+#
+# pvi is listed explicitly (above ibek) so it can be bumped without an ibek
+# release. 0.14.1 fixes sub-screen button links broken in 0.14.0
+# (https://github.com/epics-containers/pvi/pull/203). 0.14.2 is the current release.
+pvi>=0.14.2,<0.15
+# 4.8.2 is the current release
+ibek>=4.8.2,<5
 # to install direct from github during development in a branch
 # git+https://github.com/epics-containers/ibek.git@fix-extract-assets
 stdio-socket>=1.4.0

@@ -6,7 +6,10 @@
 echo "initializeCommand for devcontainerID ${1}"
 set -xe
 
-# make the config folder for the shared bash-config feature
+# create the host folders that devcontainer.json bind mounts, so that the
+# container runtime does not create them root owned:
+#   terminal-config - the user's terminal config, mounted at /user-terminal-config
+#   .cache/uv       - a cross container cache for uv
 mkdir -p ${HOME}/.config/terminal-config ${HOME}/.cache/uv
 # make a folder for auto-generated opi screens
 mkdir -p ./opi/auto-generated

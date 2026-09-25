@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://github.com/epics-containers/ioc-template-example/releases/download/4.1.0/ibek.ioc.schema.json
+# yaml-language-server: $schema=https://github.com/epics-containers/ioc-template-example/releases/latest/download/ibek.ioc.schema.json
 
 ioc_name: "{{ ioc_yaml_file_name }}"
 
