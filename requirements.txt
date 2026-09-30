@@ -4,8 +4,11 @@
 #
 # pvi is listed explicitly (above ibek) so it can be bumped without an ibek
 # release. 0.14.1 fixes sub-screen button links broken in 0.14.0
-# (https://github.com/epics-containers/pvi/pull/203). 0.14.2 is the current release.
-pvi>=0.14.2,<0.15
+# (https://github.com/epics-containers/pvi/pull/203). 0.14.3 fixes Include
+# macros (https://github.com/epics-containers/pvi/pull/202). 0.14.4 changes
+# the default LED widget (https://github.com/epics-containers/pvi/pull/208).
+# 0.14.4 is the current release.
+pvi>=0.14.4,<0.15
 # 4.8.2 is the current release
 ibek>=4.8.2,<5
 # to install direct from github during development in a branch
