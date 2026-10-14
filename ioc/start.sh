@@ -120,5 +120,5 @@ fi
 if [[ "${TEST_MODE}" == "true" ]]; then
     echo "Test mode: all runtime assets generated successfully, skipping IOC binary launch"
 else
-    "${IOC}/bin/linux-x86_64/ioc" "${RUNTIME_DIR}/st.cmd"
+    "${IOC}/bin/${EPICS_HOST_ARCH}/ioc" "${RUNTIME_DIR}/st.cmd"
 fi
