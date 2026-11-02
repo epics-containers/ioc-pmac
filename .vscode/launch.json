@@ -18,7 +18,7 @@
             "name": "(gdb) Attach to IOC",
             "type": "cppdbg",
             "request": "attach",
-            "program": "/epics/ioc/bin/linux-x86_64/ioc",
+            "program": "/epics/ioc/bin/${env:EPICS_HOST_ARCH}/ioc",
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -37,7 +37,7 @@
             "name": "Launch IOC in debugger",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/epics/ioc/bin/linux-x86_64/ioc",
+            "program": "/epics/ioc/bin/${env:EPICS_HOST_ARCH}/ioc",
             "args": [
                 "/epics/runtime/st.cmd"
             ],

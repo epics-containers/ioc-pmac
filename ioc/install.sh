@@ -6,13 +6,13 @@
 
 THIS=$(realpath $(dirname $0))
 
-x86_cfg="${THIS}/configure/CONFIG_SITE.Common.linux-x86_64"
+host_cfg="${THIS}/configure/CONFIG_SITE.Common.${EPICS_HOST_ARCH}"
 
 # for RTEMS builds don't build for the host architecture, target only
 if [[ $EPICS_TARGET_ARCH == "RTEMS"* ]]; then
-    touch ${x86_cfg}
-    sed -i '/VALID_BUILDS/d' ${x86_cfg}
-    echo "VALID_BUILDS=Host" >> ${x86_cfg}
+    touch ${host_cfg}
+    sed -i '/VALID_BUILDS/d' ${host_cfg}
+    echo "VALID_BUILDS=Host" >> ${host_cfg}
 fi
 
 
