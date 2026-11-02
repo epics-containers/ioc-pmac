@@ -5,7 +5,8 @@ on:
   pull_request:
 
 env:
-  # image names, -developer or -runtime is appended to these
+  # image names, -developer or -runtime is appended to these. Registries need
+  # lower case, so shell steps use ${NAME,,}
   NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
 
 jobs:
@@ -120,7 +121,7 @@ jobs:
           for target in developer runtime; do
             docker buildx build . --platform ${PLATFORM} --target ${target} \
               --build-arg IOC_VERSION=${IOC_VERSION} \
-              --output type=image,name=${NAME}-${target},push-by-digest=true,name-canonical=true,push=true \
+              --output type=image,name=${NAME,,}-${target},push-by-digest=true,name-canonical=true,push=true \
               --metadata-file /tmp/${target}.json
             digest=$(jq -r '."containerimage.digest"' /tmp/${target}.json)
             mkdir -p /tmp/digests/${target}
@@ -168,14 +169,24 @@ jobs:
       - name: Create manifest list and push
         working-directory: /tmp/digests/${{ matrix.target }}
         run: |
-          image=${NAME}-${{ matrix.target }}
+          image=${NAME,,}-${{ matrix.target }}
           docker buildx imagetools create -t ${image}:${{ github.ref_name }} \
             $(printf "${image}@sha256:%s " *)
           docker buildx imagetools inspect ${image}:${{ github.ref_name }}
 
+  lowername:
+    # container.image cannot call shell, so lower case the name here for it
+    if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.lower.outputs.image }}
+    steps:
+      - id: lower
+        run: echo "image=${NAME,,}-developer" >> $GITHUB_OUTPUT
+
   release:
     # Release on tag push - publish ioc schema
-    needs: [merge]
+    needs: [merge, lowername]
     if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:
@@ -184,7 +195,7 @@ jobs:
 
     # this job runs in the native developer container we just made
     container:
-      image: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-developer:${{ github.ref_name }}
+      image: ${{ needs.lowername.outputs.image }}:${{ github.ref_name }}
 
     steps:
       - name: generate-schema
@@ -195,25 +206,25 @@ jobs:
         run: |
           cp /epics/versions.json versions.json
 
-      - name: Detect pre-release tag
-        # same pre-release patterns as the "Require released ibek-support" step,
-        # so pre-release tags never become the "Latest" GitHub release
+      - name: Pre-release check
+        # pre-release tags (same patterns as the ibek-support check above) are
+        # published as GitHub pre-releases so they never become "Latest"
         id: prerelease
         env:
           TAG: ${{ github.ref_name }}
         run: |
           case "${TAG}" in
               *a[0-9]*|*b[0-9]*|*rc[0-9]*|*alpha*|*beta*|*rc.[0-9]*)
-                  echo "prerelease=true" >> "${GITHUB_OUTPUT}" ;;
+                  echo "prerelease=true" >> $GITHUB_OUTPUT ;;
               *)
-                  echo "prerelease=false" >> "${GITHUB_OUTPUT}" ;;
+                  echo "prerelease=false" >> $GITHUB_OUTPUT ;;
           esac
 
       - name: Github Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
         with:
-          prerelease: ${{ steps.prerelease.outputs.prerelease }}
           files: |
             ibek.ioc.schema.json
             versions.json
           generate_release_notes: true
+          prerelease: ${{ steps.prerelease.outputs.prerelease }}
