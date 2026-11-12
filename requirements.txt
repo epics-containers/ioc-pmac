@@ -8,12 +8,9 @@
 # to their PV (https://github.com/epics-containers/pvi/pull/210), and is the current
 # release.
 pvi>=0.14.5,<0.15
-# Pilot pin: ibek comes from a commit of the dev-sync-prebuilt branch
-# (https://github.com/epics-containers/ibek/pull/397), which provides
-# 'ibek dev stamp' and 'ibek dev sync'. It is pinned by commit so that a cached
-# image layer cannot hide later commits on the branch. This must become a
-# release pin (ibek>=X.Y.Z,<N) before this is merged.
-git+https://github.com/epics-containers/ibek.git@53288b2e9c61bbfd8fafb82f1dafda401a7f2f5b
+# 4.11.0 is the current release. It provides 'ibek dev stamp' and 'ibek dev sync',
+# which the Dockerfile and the devcontainer call.
+ibek>=4.11.0,<5
 # to install direct from github during development in a branch
 # git+https://github.com/epics-containers/ibek.git@fix-extract-assets
 stdio-socket>=1.4.0
