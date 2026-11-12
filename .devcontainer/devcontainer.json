@@ -1,10 +1,7 @@
 // For format details, see https://containers.dev/implementors/json_reference/
 {
     "name": "epics-containers IOC devcontainer",
-    "build": {
-        "dockerfile": "../Dockerfile",
-        "target": "developer"
-    },
+    "image": "ghcr.io/epics-containers/ioc-pmac-developer:latest",
     "containerEnv": {
         // provides a name for epics-containers to use in bash prompt etc.
         "EC_PROJECT": "${localWorkspaceFolderBasename}",
@@ -50,9 +47,13 @@
     "onCreateCommand": "/root/terminal-config/ensure-user-terminal-config.sh",
     // One time global setup commands inside the container
     "postCreateCommand": "bash .devcontainer/postCreateCommand ${devcontainerId}",
+    // Bring the container in line with the project folder on each start
+    "postStartCommand": "ibek dev sync || true",
     "runArgs": [
         // Make sure SELinux does not disable write access to host filesystems like tmp
-        "--security-opt=label=disable"
+        "--security-opt=label=disable",
+        // The claude-sandbox network egress jail uses pasta, which needs the tun device
+        "--device=/dev/net/tun"
     ],
     // Mount the parent of the project folder so we can access peer projects
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",

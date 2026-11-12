@@ -14,3 +14,51 @@ mkdir -p ${HOME}/.config/terminal-config ${HOME}/.cache/uv
 # make a folder for auto-generated opi screens
 mkdir -p ./opi/auto-generated
 
+
+# The devcontainer runs the developer image that CI publishes, named by the top
+# level "image" key of devcontainer.json. Pull it so that it is up to date; when
+# it cannot be pulled use the local image of that name, or build one if there
+# is none. Set EC_LOCAL_BUILD=1 to skip the pull and build the image from this
+# folder. A devcontainer.json with no top level image is left to build its own.
+image=$(awk '
+    depth == 1 && /^[[:space:]]*"image"[[:space:]]*:[[:space:]]*"/ {
+        sub(/^[[:space:]]*"image"[[:space:]]*:[[:space:]]*"/, "")
+        sub(/".*/, "")
+        print
+        exit
+    }
+    {
+        # count brackets outside of strings and comments to track nesting
+        gsub(/"([^"\\]|\\.)*"/, "")
+        sub(/\/\/.*/, "")
+        depth += gsub(/[{[]/, "") - gsub(/[]}]/, "")
+    }' .devcontainer/devcontainer.json)
+if [[ -z ${image} ]] ; then
+    echo "no image in .devcontainer/devcontainer.json, nothing to pull or build"
+    exit 0
+fi
+
+# prefer docker but use podman if USE_PODMAN is set, as ./build does
+if docker version &> /dev/null && [[ -z $USE_PODMAN ]] ; then
+    docker=docker
+elif command -v podman &> /dev/null ; then
+    docker=podman
+else
+    echo "neither docker nor podman is available to pull or build ${image}"
+    exit 1
+fi
+
+# make sure new clones get their submodule ibek-support, as ./build does
+if [ ! -d ibek-support/_global ] ; then git submodule update --init ; fi
+
+if [[ -n ${EC_LOCAL_BUILD} ]] ; then
+    echo "EC_LOCAL_BUILD is set, building ${image}"
+    TAG=${image} TARGET=developer ./build
+elif $docker pull "${image}" ; then
+    echo "pulled ${image}"
+elif $docker image inspect "${image}" &> /dev/null ; then
+    echo "could not pull ${image}, using the local image"
+else
+    echo "could not pull ${image} and there is no local image, building it"
+    TAG=${image} TARGET=developer ./build
+fi

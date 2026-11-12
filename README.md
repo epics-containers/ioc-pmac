@@ -21,6 +21,21 @@ copier update --trust .
 
 This repository includes a developer container configuration for Visual Studio Code. This allows you to run the Generic IOC locally and debug it. See https://epics-containers.github.io/main/tutorials/dev_container.html.
 
+The developer container runs the `ioc-pmac-developer:latest` image that CI publishes from the main branch, named in `.devcontainer/devcontainer.json`. Each time the container starts:
+
+- `.devcontainer/initializeCommand` pulls that image on the host. If the pull fails it uses the local image of that name, and if there is none it builds one with `./build`.
+- `ibek dev sync` runs in the container. It compares the project folder with the source the image was built from, brings the support module definitions in line and reports anything that needs a rebuild.
+
+An existing container keeps the image it was created from: use "Dev Containers: Rebuild Container" to move it to the image that was pulled.
+
+To build the image from this folder instead of pulling it, for example to try out a change to the `Dockerfile`, set `EC_LOCAL_BUILD=1` in the environment of the VS Code instance; an instance that is already running does not see it:
+
+```bash
+EC_LOCAL_BUILD=1 code .
+```
+
+Each start with `EC_LOCAL_BUILD` set runs `./build`, which removes the IOC build products and the `ioc/config` link. An existing container keeps its image until "Dev Containers: Rebuild Container".
+
 ## Channel Access
 
 The vscode developer container auto forwards the channel access ports on the loopback interface. If you have channel access clients running on the host machine, you can connect to the IOC by setting the `EPICS_CA_NAME_SERVERS` environment variable as follows:

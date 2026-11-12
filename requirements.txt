@@ -8,8 +8,10 @@
 # to their PV (https://github.com/epics-containers/pvi/pull/210), and is the current
 # release.
 pvi>=0.14.5,<0.15
-# 4.8.2 is the current release
-ibek>=4.8.2,<5
+# ibek comes from the dev-sync-prebuilt branch, which provides 'ibek dev stamp'
+# and 'ibek dev sync'. This must become a release pin (ibek>=X.Y.Z,<N) before
+# this is merged.
+git+https://github.com/epics-containers/ibek.git@dev-sync-prebuilt
 # to install direct from github during development in a branch
 # git+https://github.com/epics-containers/ibek.git@fix-extract-assets
 stdio-socket>=1.4.0

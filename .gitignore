@@ -16,6 +16,9 @@ ioc/config
 # the opi folder is also mounted into the container at /epics/ioc/opi
 opi/auto-generated
 
+# 'ibek dev support' records the modules built from host clones here
+.ibek-dev.yaml
+
 # podman may leave this around in aborted builds
 .build.swp
 
