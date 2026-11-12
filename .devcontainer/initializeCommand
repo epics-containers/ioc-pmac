@@ -15,28 +15,11 @@ mkdir -p ${HOME}/.config/terminal-config ${HOME}/.cache/uv
 mkdir -p ./opi/auto-generated
 
 
-# The devcontainer runs the developer image that CI publishes, named by the top
-# level "image" key of devcontainer.json. Pull it so that it is up to date; when
-# it cannot be pulled use the local image of that name, or build one if there
-# is none. Set EC_LOCAL_BUILD=1 to skip the pull and build the image from this
-# folder. A devcontainer.json with no top level image is left to build its own.
-image=$(awk '
-    depth == 1 && /^[[:space:]]*"image"[[:space:]]*:[[:space:]]*"/ {
-        sub(/^[[:space:]]*"image"[[:space:]]*:[[:space:]]*"/, "")
-        sub(/".*/, "")
-        print
-        exit
-    }
-    {
-        # count brackets outside of strings and comments to track nesting
-        gsub(/"([^"\\]|\\.)*"/, "")
-        sub(/\/\/.*/, "")
-        depth += gsub(/[{[]/, "") - gsub(/[]}]/, "")
-    }' .devcontainer/devcontainer.json)
-if [[ -z ${image} ]] ; then
-    echo "no image in .devcontainer/devcontainer.json, nothing to pull or build"
-    exit 0
-fi
+# The developer image that CI publishes; devcontainer.json names the same one.
+# Pull it so that it is up to date; when it cannot be pulled use the local image
+# of that name, or build one if there is none. Set EC_LOCAL_BUILD=1 to skip the
+# pull and build the image from this folder.
+image="ghcr.io/epics-containers/ioc-pmac-developer:latest"
 
 # prefer docker but use podman if USE_PODMAN is set, as ./build does
 if docker version &> /dev/null && [[ -z $USE_PODMAN ]] ; then

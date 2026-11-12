@@ -21,7 +21,7 @@ copier update --trust .
 
 This repository includes a developer container configuration for Visual Studio Code. This allows you to run the Generic IOC locally and debug it. See https://epics-containers.github.io/main/tutorials/dev_container.html.
 
-The developer container runs the `ioc-pmac-developer:latest` image that CI publishes from the main branch, named in `.devcontainer/devcontainer.json`. Each time the container starts:
+The developer container runs the `ioc-pmac-developer:latest` image that CI publishes from the main branch, named in both `.devcontainer/devcontainer.json` (what the container runs) and `.devcontainer/initializeCommand` (what is pulled or built): change one and the other must follow. Each time the container starts:
 
 - `.devcontainer/initializeCommand` pulls that image on the host. If the pull fails it uses the local image of that name, and if there is none it builds one with `./build`.
 - `ibek dev sync` runs in the container. It compares the project folder with the source the image was built from, brings the support module definitions in line and reports anything that needs a rebuild.
