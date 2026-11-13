@@ -16,6 +16,9 @@ ioc/config
 # the opi folder is also mounted into the container at /epics/ioc/opi
 opi/auto-generated
 
+# a developer's own switch to build the devcontainer image locally - not for commit
+.devcontainer/local-build
+
 # 'ibek dev support' records the modules built from host clones here
 .ibek-dev.yaml
 
