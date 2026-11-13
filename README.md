@@ -28,13 +28,13 @@ The developer container runs the `ioc-pmac-developer:latest` image that CI publi
 
 An existing container keeps the image it was created from: use "Dev Containers: Rebuild Container" to move it to the image that was pulled.
 
-To build the image from this folder instead of pulling it, for example to try out a change to the `Dockerfile`, set `EC_LOCAL_BUILD=1` in the environment of the VS Code instance; an instance that is already running does not see it:
+To build the image from this folder instead of pulling it, for example to try out a change to the `Dockerfile`, set `EC_LOCAL_BUILD` to `1`, `true` or `yes` (in any case) in the environment of the VS Code instance; an instance that is already running does not see it. Any other value, such as `0` or `false`, or no value, leaves the local build off:
 
 ```bash
 EC_LOCAL_BUILD=1 code .
 ```
 
-Each start with `EC_LOCAL_BUILD` set runs `./build`, which removes the IOC build products and the `ioc/config` link. An existing container keeps its image until "Dev Containers: Rebuild Container".
+Each start with `EC_LOCAL_BUILD` on runs `./build`, which removes the IOC build products and the `ioc/config` link. An existing container keeps its image until "Dev Containers: Rebuild Container".
 
 ## Channel Access
 

@@ -17,8 +17,9 @@ mkdir -p ./opi/auto-generated
 
 # The developer image that CI publishes; devcontainer.json names the same one.
 # Pull it so that it is up to date; when it cannot be pulled use the local image
-# of that name, or build one if there is none. Set EC_LOCAL_BUILD=1 to skip the
-# pull and build the image from this folder.
+# of that name, or build one if there is none. Set EC_LOCAL_BUILD to 1, true or
+# yes (in any case) to skip the pull and build the image from this folder; any
+# other value, or none, leaves that off.
 image="ghcr.io/epics-containers/ioc-pmac-developer:latest"
 
 # prefer docker but use podman if USE_PODMAN is set, as ./build does
@@ -34,8 +35,13 @@ fi
 # make sure new clones get their submodule ibek-support, as ./build does
 if [ ! -d ibek-support/_global ] ; then git submodule update --init ; fi
 
-if [[ -n ${EC_LOCAL_BUILD} ]] ; then
-    echo "EC_LOCAL_BUILD is set, building ${image}"
+case $(echo "${EC_LOCAL_BUILD}" | tr '[:upper:]' '[:lower:]') in
+    1|true|yes) local_build=true ;;
+    *) local_build= ;;
+esac
+
+if [[ -n ${local_build} ]] ; then
+    echo "EC_LOCAL_BUILD is ${EC_LOCAL_BUILD}, building ${image}"
     TAG=${image} TARGET=developer ./build
 elif $docker pull "${image}" ; then
     echo "pulled ${image}"
