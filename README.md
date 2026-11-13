@@ -30,13 +30,15 @@ A pre-release tag does not move `latest`. A repository that has made no full rel
 
 An existing container keeps the image it was created from: use "Dev Containers: Rebuild Container" to move it to the image that was pulled. While the container was created from a different image than the one on the machine, usually an older one, `.devcontainer/initializeCommand` and the `ibek dev` commands print a WARNING that says so.
 
+A container starts without the IOC build products when it is created, by the first start or by "Dev Containers: Rebuild Container". `.devcontainer/postCreateCommand` removes `bin`, `lib`, `dbd`, `db` and the `O.*` folders from `ioc/` in the project folder, because they were built against the support modules of another container. Run `make` in `/epics/ioc` to build the IOC: `ibek dev status` says when that is needed. Source files and the `ioc/config` link that `ibek dev instance` makes are kept, and reopening an existing container keeps its build products.
+
 To run the image built from your own tree instead, for example after changing the `Dockerfile` or on a branch that is far from main, create the marker file and use "Dev Containers: Rebuild Container":
 
 ```bash
 touch .devcontainer/local-build
 ```
 
-While that file exists each start builds the image with `./build`, which is quick when the layers are cached, instead of pulling it. `./build` removes the IOC build products and the `ioc/config` link. Delete the file to go back to the published image. Git ignores the file.
+While that file exists each start builds the image with `./build`, which is quick when the layers are cached, instead of pulling it. The build leaves the project folder as it is: `.dockerignore` keeps the IOC build products and the `ioc/config` link out of the image. Delete the file to go back to the published image. Git ignores the file.
 
 ## Channel Access
 

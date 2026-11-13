@@ -13,10 +13,6 @@ TAG=${TAG:-ec_test}
 
 cd $(dirname ${0})
 
-# make sure the ioc binaries and config symlink are cleaned up. This removes
-# ignored files only, so source that is not yet tracked is kept
-git clean -fdX ioc
-
 # prefer docker but use podman if USE_PODMAN is set
 if docker version &> /dev/null && [[ -z $USE_PODMAN ]]
     then docker=docker
