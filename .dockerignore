@@ -3,6 +3,7 @@ README.md
 repos*
 .github
 .gitignore
-# scratch files that ansible leaves in the tree: a changed one would rebuild every module
+# scratch files and folders that ansible leaves in the tree: one would rebuild every module
 **/.tmp.install.yml
 **/.ansible
+**/_ansible/vars
