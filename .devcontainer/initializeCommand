@@ -22,13 +22,17 @@ mkdir -p ./opi/auto-generated
 # the image from this folder.
 image="ghcr.io/epics-containers/ioc-pmac-developer:latest"
 
+# print a status line in bold colour (31 red, 32 green, 33 yellow). Callers
+# discard the xtrace of the call, so that the line shows once
+say() { printf '\n\033[1;%sm%s\033[0m\n' "$1" "$2" ; }
+
 # prefer docker but use podman if USE_PODMAN is set, as ./build does
 if docker version &> /dev/null && [[ -z $USE_PODMAN ]] ; then
     docker=docker
 elif command -v podman &> /dev/null ; then
     docker=podman
 else
-    echo "neither docker nor podman is available to pull or build ${image}"
+    { say 31 "neither docker nor podman is available to pull or build ${image}" ; } 2> /dev/null
     exit 1
 fi
 
@@ -36,13 +40,13 @@ fi
 if [ ! -d ibek-support/_global ] ; then git submodule update --init ; fi
 
 if [[ -e .devcontainer/local-build ]] ; then
-    echo ".devcontainer/local-build exists, building ${image}. Delete that file to pull the image"
+    { say 33 ".devcontainer/local-build exists, building ${image}. Delete that file to pull the image" ; } 2> /dev/null
     TAG=${image} TARGET=developer ./build
 elif $docker pull "${image}" ; then
-    echo "pulled ${image}"
+    { say 32 "pulled ${image}" ; } 2> /dev/null
 elif $docker image inspect "${image}" &> /dev/null ; then
-    echo "could not pull ${image}, using the local image"
+    { say 33 "could not pull ${image}, using the local image" ; } 2> /dev/null
 else
-    echo "could not pull ${image} and there is no local image, building it"
+    { say 33 "could not pull ${image} and there is no local image, building it" ; } 2> /dev/null
     TAG=${image} TARGET=developer ./build
 fi
