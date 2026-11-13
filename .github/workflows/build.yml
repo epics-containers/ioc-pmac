@@ -8,10 +8,6 @@ env:
   # image names, -developer or -runtime is appended to these. Registries need
   # lower case, so shell steps use ${NAME,,}
   NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
-  # images are published by a tag, under its own name, and by a push to main,
-  # as latest. The devcontainer runs the latest developer image
-  PUBLISH: ${{ github.event_name == 'push' && (github.ref_type == 'tag' || github.ref == 'refs/heads/main') }}
-  IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}
 
 jobs:
   build:
@@ -116,15 +112,13 @@ jobs:
           exit ${status}
 
       - name: Push images by digest
-        if: ${{ env.PUBLISH == 'true' }}
+        if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
         env:
           PLATFORM: ${{ matrix.platform }}
           IOC_VERSION: ${{ github.ref_name }}
-          # main publishes the developer image only
-          TARGETS: ${{ github.ref_type == 'tag' && 'developer runtime' || 'developer' }}
         run: |
           # the builder cache from the build step makes these quick
-          for target in ${TARGETS}; do
+          for target in developer runtime; do
             docker buildx build . --platform ${PLATFORM} --target ${target} \
               --build-arg IOC_VERSION=${IOC_VERSION} \
               --output type=image,name=${NAME,,}-${target},push-by-digest=true,name-canonical=true,push=true \
@@ -135,7 +129,7 @@ jobs:
           done
 
       - name: Upload digests
-        if: ${{ env.PUBLISH == 'true' }}
+        if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
         uses: actions/upload-artifact@v4
         with:
           name: digests-${{ steps.platform.outputs.pair }}
@@ -146,14 +140,13 @@ jobs:
   merge:
     # combine the per-platform images into multi-arch tags
     needs: [build]
-    if: ${{ github.event_name == 'push' && (github.ref_type == 'tag' || github.ref == 'refs/heads/main') }}
+    if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
     strategy:
       matrix:
-        # main publishes the developer image only
-        target: ${{ fromJSON(github.ref_type == 'tag' && '["developer", "runtime"]' || '["developer"]') }}
+        target: [developer, runtime]
 
     steps:
       - name: Download digests
@@ -175,45 +168,23 @@ jobs:
 
       - name: Create manifest list and push
         working-directory: /tmp/digests/${{ matrix.target }}
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
           image=${NAME,,}-${{ matrix.target }}
-          docker buildx imagetools create -t ${image}:${IMAGE_TAG} \
+          # A full release also tags the developer image latest, which the
+          # devcontainer opens from. Pre-release tags (same patterns as the
+          # ibek-support check above and the release job below) do not
+          latest=""
+          if [ "${{ matrix.target }}" = developer ]; then
+              case "${TAG}" in
+                  *a[0-9]*|*b[0-9]*|*rc[0-9]*|*alpha*|*beta*|*rc.[0-9]*) ;;
+                  *) latest="-t ${image}:latest" ;;
+              esac
+          fi
+          docker buildx imagetools create -t ${image}:${{ github.ref_name }} ${latest} \
             $(printf "${image}@sha256:%s " *)
-          docker buildx imagetools inspect ${image}:${IMAGE_TAG}
-
-  cleanup:
-    # Each push to main moves the latest tag and leaves the developer images it
-    # pointed at untagged. Untagged runtime images are left by a tag that is
-    # pushed again, by a run that fails between the push by digest and the
-    # merge job, and by versions deleted by hand. This lists the untagged
-    # images of both packages older than a day, which no build in progress can
-    # still be using. It is a dry run that deletes nothing: read its log, then
-    # set dry-run to false to delete them.
-    needs: [merge]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    # the action fails on a package that does not exist yet, such as runtime before the first tag
-    continue-on-error: true
-    # the action must not run twice at once against the same package
-    concurrency:
-      group: cleanup-images
-    permissions:
-      packages: write
-
-    steps:
-      - name: Package names
-        id: package
-        run: |
-          repo=${NAME##*/}
-          echo "names=${repo,,}-developer,${repo,,}-runtime" >> $GITHUB_OUTPUT
-
-      - name: Clean up untagged images
-        uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f # v1.2.2
-        with:
-          package: ${{ steps.package.outputs.names }}
-          delete-untagged: true
-          older-than: 1 day
-          dry-run: true
+          docker buildx imagetools inspect ${image}:${{ github.ref_name }}
 
   lowername:
     # container.image cannot call shell, so lower case the name here for it

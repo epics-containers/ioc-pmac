@@ -15,7 +15,8 @@ mkdir -p ${HOME}/.config/terminal-config ${HOME}/.cache/uv
 mkdir -p ./opi/auto-generated
 
 
-# The developer image that CI publishes; devcontainer.json names the same one.
+# The developer image that CI publishes as latest with each full release;
+# devcontainer.json names the same one.
 # Pull it so that it is up to date; when it cannot be pulled use the local image
 # of that name, or build one if there is none. When the marker file
 # .devcontainer/local-build exists, whatever it holds, skip the pull and build
