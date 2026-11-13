@@ -14,6 +14,80 @@ if [[ $(id -u) != "0" ]] ; then
     sudo chown -h ${USER}:${USER} /epics /epics/ioc /epics/support
 fi
 
+################################################################################
+# Remove the IOC build products that another container left in the project
+################################################################################
+
+# The project folder is a bind mount of the host folder and /epics/ioc links to
+# its ioc folder, so what 'make' builds there outlives the container:
+#   bin lib dbd db - the install folders at the top of ioc
+#   O.*            - the build folders, in configure and beside each Makefile
+# Those products are compiled and linked against the support modules of the
+# container that built them. This container may come from another image, with
+# other support modules: the binary would be stale, and stale products have
+# made 'make' in /epics/ioc loop. So each container starts without them and
+# builds its own. This script runs when a container is created, not when it is
+# reopened: a reopened container keeps its products, which still match it.
+#
+# Source files are kept, tracked or not, and so is ioc/config: the link that
+# 'ibek dev instance' makes to an IOC instance, which is valid in any container.
+# This uses rm and find rather than git or make: git refuses a project folder
+# that another user owns, and make is what misbehaves on stale products.
+# Nothing here may stop the container from being created, so failures only print
+
+clean_ioc() {
+    local project ioc product products=() removed=() kept=()
+
+    # the project is the folder that holds .devcontainer and this script, which
+    # is the folder mounted at /epics/generic-source
+    project=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." 2> /dev/null && pwd)
+    ioc="${project}/ioc"
+    # only remove things from a folder that is the source of a generic IOC
+    if [[ -z ${project} || ! -f ${ioc}/Makefile || ! -d ${ioc}/configure ]] ; then
+        echo "postCreateCommand: no IOC source in '${ioc}', no build products removed"
+        return 0
+    fi
+
+    for product in bin lib dbd db ; do
+        if [[ -d ${ioc}/${product} && ! -L ${ioc}/${product} ]] ; then
+            products+=("${ioc}/${product}")
+        fi
+    done
+    # find does not follow links, so it stays out of the ioc/config instance
+    while IFS= read -r -d '' product ; do
+        products+=("${product}")
+    done < <(find "${ioc}" -mindepth 1 -type d -name 'O.*' -prune -print0 2> /dev/null)
+
+    for product in "${products[@]}" ; do
+        rm -rf -- "${product}" 2> /dev/null
+        # a folder without write permission keeps its contents until it has it
+        if [[ -e ${product} ]] ; then
+            chmod -R u+w -- "${product}" 2> /dev/null
+            rm -rf -- "${product}" 2> /dev/null
+        fi
+        # the non-root user cannot remove what a container running as root built
+        if [[ -e ${product} && $(id -u) != "0" ]] ; then
+            sudo -n rm -rf -- "${product}" 2> /dev/null
+        fi
+        if [[ -e ${product} ]] ; then
+            kept+=("${product#"${ioc}/"}")
+        else
+            removed+=("${product#"${ioc}/"}")
+        fi
+    done
+
+    if [[ ${#kept[@]} != 0 ]] ; then
+        echo "postCreateCommand: WARNING could not remove IOC build products from ${ioc}: ${kept[*]}"
+    fi
+    if [[ ${#removed[@]} != 0 ]] ; then
+        echo "postCreateCommand: removed IOC build products from ${ioc}: ${removed[*]}. Run 'make' in /epics/ioc"
+    elif [[ ${#kept[@]} == 0 ]] ; then
+        echo "postCreateCommand: no IOC build products to remove from ${ioc}"
+    fi
+    return 0
+}
+clean_ioc
+
 # record the image that this container is created from, for 'ibek dev' to
 # compare with the one that initializeCommand finds on each start
 if [[ -f /epics/generic-source/.devcontainer/image-id ]] ; then

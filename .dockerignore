@@ -7,3 +7,12 @@ repos*
 **/.tmp.install.yml
 **/.ansible
 **/_ansible/vars
+# what a devcontainer leaves in the ioc folder of the host tree: an image must not contain it
+ioc/config
+ioc/bin
+ioc/lib
+ioc/dbd
+ioc/db
+ioc/data
+ioc/.iocsh_history
+ioc/**/O.*
