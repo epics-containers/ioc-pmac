@@ -13,3 +13,9 @@ if [[ $(id -u) != "0" ]] ; then
     sudo chown -R ${USER}:${USER} /epics/ibek-defs /epics/pvi-defs /epics/support/configure /venv
     sudo chown -h ${USER}:${USER} /epics /epics/ioc /epics/support
 fi
+
+# record the image that this container is created from, for 'ibek dev' to
+# compare with the one that initializeCommand finds on each start
+if [[ -f /epics/generic-source/.devcontainer/image-id ]] ; then
+    cp /epics/generic-source/.devcontainer/image-id /epics/dev-image-id || true
+fi

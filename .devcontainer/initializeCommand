@@ -50,3 +50,34 @@ else
     { say 33 "could not pull ${image} and there is no local image, building it" ; } 2> /dev/null
     TAG=${image} TARGET=developer ./build
 fi
+
+# Record the ID of the image that the tag points to. postCreateCommand keeps a
+# copy in each container it creates, for 'ibek dev' to compare with this file
+if image_id=$($docker image inspect --format '{{.Id}}' "${image}" 2> /dev/null) && [[ -n ${image_id} ]] ; then
+    echo "${image_id}" > .devcontainer/image-id || true
+else
+    rm -f .devcontainer/image-id || true
+fi
+
+# WARNING when a container that exists for this project folder was created from
+# a different image: VS Code reuses it as it is. VS Code labels the containers
+# it creates with the folder (a symlinked path does not match). Each container
+# holds the record that postCreateCommand made of its image, which is read
+# without starting it. 'ibek dev' compares the same two values in the container,
+# so the two warnings agree. A container with no record gives no warning
+stale=
+for container in $($docker ps -a -q --filter "label=devcontainer.local_folder=$(pwd)" 2> /dev/null) ; do
+    # cp to - gives a tar stream of the one file
+    recorded=$($docker cp "${container}:/epics/dev-image-id" - 2> /dev/null | tar -xOf - 2> /dev/null | tr -d '[:space:]')
+    if [[ -n ${image_id} && -n ${recorded} && ${recorded#sha256:} != "${image_id#sha256:}" ]] ; then
+        stale="${stale} ${container}"
+    fi
+done
+if [[ -n ${stale} ]] ; then
+    if [[ ${stale} == *" "*" "* ]] ; then
+        stale="containers${stale} were" ; it=them
+    else
+        stale="container${stale} was" ; it=it
+    fi
+    { say 33 "WARNING: this project's existing ${stale} created from a different image. \"Reopen in Container\" keeps using ${it}: use \"Dev Containers: Rebuild Container\" to replace ${it}." ; } 2> /dev/null
+fi
