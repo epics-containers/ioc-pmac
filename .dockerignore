@@ -1,6 +1,9 @@
-Dockerfile
 LICENSE
 README.md
 repos*
 .github
 .gitignore
+# scratch files and folders that ansible leaves in the tree: one would rebuild every module
+**/.tmp.install.yml
+**/.ansible
+**/_ansible/vars

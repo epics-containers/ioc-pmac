@@ -21,6 +21,23 @@ copier update --trust .
 
 This repository includes a developer container configuration for Visual Studio Code. This allows you to run the Generic IOC locally and debug it. See https://epics-containers.github.io/main/tutorials/dev_container.html.
 
+The developer container runs the `ioc-pmac-developer:latest` image that CI publishes with each full release, named in both `.devcontainer/devcontainer.json` (what the container runs) and `.devcontainer/initializeCommand` (what is pulled or built): change one and the other must follow. Each time the container starts:
+
+- `.devcontainer/initializeCommand` pulls that image on the host. If the pull fails it uses the local image of that name, and if there is none it builds one with `./build`.
+- `ibek dev sync` runs in the container. It compares the project folder with the source the image was built from, brings the support module definitions in line and reports anything that needs a rebuild.
+
+A pre-release tag does not move `latest`. A repository that has made no full release from this template has no such image, so its first start builds one locally. Changes merged to main after the last release are not in the image: `ibek dev sync` reports the difference.
+
+An existing container keeps the image it was created from: use "Dev Containers: Rebuild Container" to move it to the image that was pulled. While the container was created from a different image than the one on the machine, usually an older one, `.devcontainer/initializeCommand` and the `ibek dev` commands print a WARNING that says so.
+
+To run the image built from your own tree instead, for example after changing the `Dockerfile` or on a branch that is far from main, create the marker file and use "Dev Containers: Rebuild Container":
+
+```bash
+touch .devcontainer/local-build
+```
+
+While that file exists each start builds the image with `./build`, which is quick when the layers are cached, instead of pulling it. `./build` removes the IOC build products and the `ioc/config` link. Delete the file to go back to the published image. Git ignores the file.
+
 ## Channel Access
 
 The vscode developer container auto forwards the channel access ports on the loopback interface. If you have channel access clients running on the host machine, you can connect to the IOC by setting the `EPICS_CA_NAME_SERVERS` environment variable as follows:

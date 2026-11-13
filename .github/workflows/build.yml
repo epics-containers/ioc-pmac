@@ -168,9 +168,21 @@ jobs:
 
       - name: Create manifest list and push
         working-directory: /tmp/digests/${{ matrix.target }}
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
           image=${NAME,,}-${{ matrix.target }}
-          docker buildx imagetools create -t ${image}:${{ github.ref_name }} \
+          # A full release also tags the developer image latest, which the
+          # devcontainer opens from. Pre-release tags (same patterns as the
+          # ibek-support check above and the release job below) do not
+          latest=""
+          if [ "${{ matrix.target }}" = developer ]; then
+              case "${TAG}" in
+                  *a[0-9]*|*b[0-9]*|*rc[0-9]*|*alpha*|*beta*|*rc.[0-9]*) ;;
+                  *) latest="-t ${image}:latest" ;;
+              esac
+          fi
+          docker buildx imagetools create -t ${image}:${{ github.ref_name }} ${latest} \
             $(printf "${image}@sha256:%s " *)
           docker buildx imagetools inspect ${image}:${{ github.ref_name }}
 
