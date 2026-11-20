@@ -20,7 +20,7 @@ if docker version &> /dev/null && [[ -z $USE_PODMAN ]]
 fi
 
 # make sure new repos get their submodule ibek-support
-if [ ! -d ibek-support/_global ] ; then git submodule update --init ; fi
+if [ ! -e ibek-support/.git ] ; then git submodule update --init ; fi
 
 # build runtime or developer image for the host platform (amd64 or arm64)
 set -x
