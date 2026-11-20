@@ -8,10 +8,13 @@
 # to their PV (https://github.com/epics-containers/pvi/pull/210), and is the current
 # release.
 pvi>=0.14.5,<0.15
-# 4.11.1 is the current release. It provides 'ibek dev stamp' and 'ibek dev sync',
-# which the Dockerfile and the devcontainer call, and the WARNING that 'ibek dev'
-# prints when a container is on a different image.
-ibek>=4.11.1,<5
+# 4.12.0 is the current release. It provides 'ibek dev stamp' and 'ibek dev sync',
+# which the Dockerfile and the devcontainer call, the WARNING that 'ibek dev'
+# prints when a container is on a different image, and 'ibek dev support', which
+# builds support modules from clones on the host. Its 'ibek dev sync --build'
+# clones again a module whose clone failed or whose folder is missing.
+# ioc-pmac needs 4.12.1, which accepts the post_db_files key in ioc.yaml
+ibek>=4.12.1,<5
 # to install direct from github during development in a branch
 # git+https://github.com/epics-containers/ibek.git@fix-extract-assets
 stdio-socket>=1.4.0
