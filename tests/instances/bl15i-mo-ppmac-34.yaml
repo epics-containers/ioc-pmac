@@ -1,0 +1,321 @@
+# yaml-language-server: $schema=../ioc.schema.json
+# Copied from https://gitlab.diamond.ac.uk/controls/containers/beamline/i15-services
+# services/bl15i-mo-ppmac-34/config/ioc.yaml at commit 0771317a21c139577b62258d075973f7d3830e04
+# Changed, so that nobody running this test reaches a real device:
+# - 1 device address replaced with 127.0.0.1
+# - 1 password value replaced with "redacted"
+# tests/run-tests.sh runs it with start.sh --test, which generates the
+# runtime assets but does not launch the IOC.
+
+ioc_name: "{{ _global.get_env('IOC_NAME') }}"
+
+description: BL15I-MO-PPMAC-34
+
+entities:
+  - type: epics.EpicsEnvSet
+    name: EPICS_TS_MIN_WEST
+    value: "0"
+
+  - type: epics.EpicsEnvSet
+    name: STREAM_PROTOCOL_PATH
+    value: /epics/runtime/protocol/
+
+  - type: devIocStats.iocAdminSoft
+    IOC: "{{ ioc_name | upper }}"
+
+  - type: pvlogging.PvLogging
+    access_file: /epics/support/pvlogging/src/access.acf
+
+  - type: autosave.Autosave
+    P: 'BL15I-MO-IOC-34:'
+    debug: false
+
+  - type: pmac.pmacAsynSSHPort
+    IP: 127.0.0.1
+    PASSWORD: "redacted"
+    name: PMAC34port
+
+  - type: pmac.PowerPMAC
+    FEEDRATE: 0
+    P: BL15I-MO-PPMAC-34
+    pmacAsynSSHPort: PMAC34port
+    name: PMAC34
+
+  - type: pmac.CS
+    CS: 2
+    PmacController: PMAC34
+    name: PMAC34CS2
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 0.1
+    ADDR: 1
+    Controller: PMAC34
+    DESC: Small KB Jack 1
+    DHLM: 1000
+    DIR: Pos
+    DLLM: -1000
+    EGU: mm
+    FOFF: Variable
+    M: :J1
+    MRES: 0.000159
+    OFF: -33.26
+    P: BL15I-OP-MIRR-03:BASE
+    PREC: 4
+    TWV: 1
+    UEIP: No
+    VELO: 1.25
+    VMAX: 1.25
+    alh: '#'
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 0.1
+    ADDR: 2
+    Controller: PMAC34
+    DESC: Small KB Jack 2
+    DHLM: 1000
+    DIR: Pos
+    DLLM: -1000
+    EGU: mm
+    FOFF: Variable
+    M: :J2
+    MRES: 0.000159
+    OFF: -32.8
+    P: BL15I-OP-MIRR-03:BASE
+    PREC: 4
+    TWV: 1
+    UEIP: No
+    VELO: 1.25
+    VMAX: 1.25
+    alh: '#'
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 0.1
+    ADDR: 3
+    Controller: PMAC34
+    DESC: Small KB Jack 3
+    DHLM: 1000
+    DIR: Pos
+    DLLM: -1000
+    EGU: mm
+    FOFF: Variable
+    M: :J3
+    OFF: -31.4
+    MRES: 0.000159
+    P: BL15I-OP-MIRR-03:BASE
+    PREC: 4
+    TWV: 1
+    UEIP: No
+    VELO: 1.25
+    VMAX: 1.25
+    alh: '#'
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 1
+    ADDR: 4
+    Controller: PMAC34
+    DESC: Tab2 Detector Z
+    DHLM: -1.10
+    DIR: Pos
+    DLLM: -485.60
+    EGU: mm
+    FOFF: Variable
+    M: :DETECTOR2:Z
+    MRES: 0.0001
+    P: BL15I-MO-TABLE-03
+    OFF: 641.1
+    PREC: 2
+    TWV: 1
+    UEIP: No
+    VELO: 1.4
+    VMAX: 1.5
+    alh: '#'
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 0.25
+    ADDR: 5
+    Controller: PMAC34
+    DESC: Tab2 Superhead X
+    DHLM: 156.310
+    DIR: Pos
+    DLLM: -145.690
+    EGU: mm
+    FOFF: Variable
+    M: :X
+    MRES: -0.001
+    OFF: 33.69
+    P: BL15I-MO-SHEAD-02
+    PREC: 3
+    TWV: 1
+    UEIP: No
+    VELO: 40
+    VMAX: 40
+    alh: '#'
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 0.25
+    ADDR: 6
+    Controller: PMAC34
+    DESC: Tab2 Superhead Y
+    DHLM: 11.84
+    DIR: Pos
+    DLLM: -12.16
+    EGU: mm
+    FOFF: Variable
+    M: :Y
+    MRES: -5e-05
+    OFF: 19.16
+    P: BL15I-MO-SHEAD-02
+    PREC: 4
+    TWV: 1
+    UEIP: No
+    VELO: 0.5
+    VMAX: 0.5
+    alh: '#'
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 0.1
+    ADDR: 7
+    Controller: PMAC34
+    DESC: Diode 9 X
+    DHLM: 0.34
+    DIR: Pos
+    DLLM: -257.66
+    EGU: mm
+    FOFF: Variable
+    M: :X
+    MRES: -0.00077
+    OFF: 205.66
+    P: BL15I-DI-PHDGN-09
+    HOME: BL15I-DI-PHDGN-09:HOMEB
+    PREC: 4
+    TWV: 1
+    UEIP: No
+    VELO: 60
+    VMAX: 60
+    alh: '#'
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 1
+    ADDR: 8
+    Controller: PMAC34
+    DESC: Diff Detector Z
+    DHLM: 314
+    DIR: Pos
+    DLLM: -1686
+    EGU: mm
+    FOFF: Variable
+    M: :DETECTOR:Z
+    MRES: 0.0002
+    OFF: 686
+    P: BL15I-MO-DIFF-01:ARM
+    PREC: 2
+    TWV: 1
+    UEIP: No
+    VELO: 5
+    VMAX: 5
+    alh: '#'
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 1
+    ADDR: 9
+    Controller: PMAC34CS2
+    DESC: Small KB Y
+    DHLM: 1000
+    DIR: Pos
+    DLLM: -1000
+    EGU: mm
+    FOFF: Variable
+    HOMEVIS: 0
+    M: :Y
+    MRES: 0.0001
+    P: BL15I-OP-MIRR-03:BASE
+    PREC: 4
+    TWV: 1
+    UEIP: No
+    VELO: 1.25
+    VMAX: 1.25
+    alh: '#'
+    is_cs: true
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 1
+    ADDR: 7
+    Controller: PMAC34CS2
+    DESC: Small KB Pitch
+    DHLM: 1000
+    DIR: Pos
+    DLLM: -1000
+    EGU: deg
+    FOFF: Variable
+    HOMEVIS: 0
+    M: :PITCH
+    MRES: 0.0001
+    P: BL15I-OP-MIRR-03:BASE
+    PREC: 4
+    TWV: 1
+    UEIP: No
+    VELO: 0.05
+    VMAX: 0.05
+    alh: '#'
+    is_cs: true
+
+  - type: pmac.dls_pmac_asyn_motor
+    ACCL: 1
+    ADDR: 8
+    Controller: PMAC34CS2
+    DESC: Small KB Roll
+    DHLM: 1000
+    DIR: Pos
+    DLLM: -1000
+    EGU: deg
+    FOFF: Variable
+    HOMEVIS: 0
+    M: :ROLL
+    MRES: 0.0001
+    P: BL15I-OP-MIRR-03:BASE
+    PREC: 4
+    TWV: 1
+    UEIP: No
+    VELO: 0.05
+    VMAX: 0.05
+    alh: '#'
+    is_cs: true
+
+  # - type: motor.motorUtil
+  #   P: 'BL15I-MO-IOC-34:'
+
+  - type: pmac.autohome
+    DESC: Homing
+    GRP2: J1,J2,J3
+    P: BL15I-OP-MIRR-03:BASE
+    PLC: 11
+    PmacController: PMAC34
+
+  - type: pmac.autohome
+    DESC: Homing
+    GRP2: X
+    GRP3: Y
+    P: BL15I-MO-SHEAD-02
+    PLC: 12
+    PmacController: PMAC34
+
+  - type: pmac.autohome
+    DESC: Homing
+    GRP2: X
+    P: BL15I-DI-PHDGN-09:HOMEB
+    PLC: 13
+    PmacController: PMAC34
+
+  - type: pmac.autohome
+    DESC: Homing
+    GRP2: Detector Z
+    P: BL15I-MO-DIFF-01:ARM
+    PLC: 14
+    PmacController: PMAC34
+
+  - type: pmac.autohome
+    DESC: Homing
+    GRP2: Detector 2 Z
+    P: BL15I-MO-TABLE-03
+    PLC: 15
+    PmacController: PMAC34

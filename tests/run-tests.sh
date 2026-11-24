@@ -68,4 +68,26 @@ elif ! echo "${test_result}" | grep -q "Test mode:"; then
     exit 1
 fi
 
+# check real instance configs: each tests/instances/*.yaml is the ioc.yaml of a
+# deployed IOC instance that uses this generic IOC. --test generates its st.cmd
+# and expanded database but does not launch the IOC, so the device addresses in
+# it are never contacted. The config is copied into a folder of its own because
+# start.sh reads it as ioc.yaml.
+instance_conf=${THIS}/.instance-config
+for instance in ${THIS}/instances/*.yaml; do
+    [[ -f ${instance} ]] || continue
+    rm -rf ${instance_conf} && mkdir ${instance_conf}
+    cp ${instance} ${instance_conf}/ioc.yaml
+    mounts=" -v ${instance_conf}:${CONF}:ro -v ${ROOT}/ioc/start.sh:/epics/ioc/start.sh:ro"
+    # a deployed instance gets IOC_NAME from its deployment
+    name=$(basename ${instance} .yaml)
+    if ! instance_result=$(run_in_image "IOC_NAME=${name} /epics/ioc/start.sh --test") ||
+        ! echo "${instance_result}" | grep -q "Test mode:"; then
+        echo "${instance_result}"
+        echo "ERROR: --test failed for instance $(basename ${instance})"
+        exit 1
+    fi
+done
+rm -rf ${instance_conf}
+
 echo "Tests passed!"
